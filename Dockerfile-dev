@@ -1,0 +1,15 @@
+FROM node:alpine AS BUILDER
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm i
+
+FROM BUILDER AS RUNNER
+
+WORKDIR /usr/src/app
+
+RUN npm run dev
+
+
