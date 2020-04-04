@@ -64,7 +64,7 @@ const config = {
       filename: "./index.html",
     }),
     new CopyWebpackPlugin([
-      { from: "public", to: "dist" },
+      { from: "public", to: "" },
       { from: "src/worker", to: "" },
     ]),
   ],
