@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 
 const App = () => <p>Hello, World cool!</p>;
 
+//Service worker registration
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("./serviceWorker.js").then(
