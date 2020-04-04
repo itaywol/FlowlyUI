@@ -1,24 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
 
-const App = () => <p>Hello, World cool!</p>;
+ReactDOM.render(<App />, document.getElementById('root'));
 
-//Service worker registration
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./serviceWorker.js").then(
-      function (registration) {
-        console.log("Service worker registration scope:" + registration.scope);
-      },
-      function (err) {
-        console.log(err);
-      }
-    );
-  });
-}
-
-if (module.hot) {
-  module.hot.accept();
-}
-
-ReactDOM.render(<App />, document.getElementById("root"));
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
