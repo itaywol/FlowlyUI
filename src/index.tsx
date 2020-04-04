@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-const App = () => <p>Hello, World!</p>;
+const App = () => <p>Hello, World cool!</p>;
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
