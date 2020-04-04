@@ -1,0 +1,7 @@
+{
+  "name": "performa-front",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
