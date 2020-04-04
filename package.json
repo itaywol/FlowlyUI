@@ -1,25 +1,33 @@
 {
-  "name": "src",
+  "name": "PerformaFront",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack"
+    "build": "webpack --mode production",
+    "dev": "cross-env NODE_ENV=development PORT=5858 PUBLIC_PATH=/ webpack-dev-server --mode development --hot"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
-  },
   "devDependencies": {
     "@types/react": "^16.9.32",
     "@types/react-dom": "^16.9.6",
+    "@types/webpack-env": "^1.15.1",
+    "awesome-typescript-loader": "^5.2.1",
+    "copy-webpack-plugin": "^5.1.1",
+    "cross-env": "^7.0.2",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.0.4",
     "source-map-loader": "^0.2.4",
-    "ts-loader": "^6.2.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "worker-plugin": "^4.0.2"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   }
 }

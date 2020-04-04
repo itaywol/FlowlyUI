@@ -1,39 +1,73 @@
-module.exports = {
-  mode: "production",
+const { resolve } = require("path");
 
-  // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const WorkerPlugin = require("worker-plugin");
+const isDevelopment = process.env.NODE_ENV !== "production";
+const dist = resolve(__dirname, "dist");
 
-  resolve: {
-    extensions: [".ts", ".tsx"],
+console.log(process.env.NODE_ENV);
+console.log(process.env.PORT);
+console.log(process.env.PUBLIC_PATH);
+
+const config = {
+  entry: {
+    main: resolve("./src/index.tsx"),
   },
-
+  output: {
+    path: dist,
+    hotUpdateChunkFilename: "hot-update.js",
+    hotUpdateMainFilename: "hot-update.json",
+    publicPath: process.env.PUBLIC_PATH,
+  },
+  devServer: {
+    historyApiFallback: true,
+    allowedHosts: ["*"],
+    host: "0.0.0.0",
+    port: 5858,
+    inline: true,
+    hot: true,
+    writeToDisk: true,
+    proxy: {
+      changeOrigin: true,
+    },
+  },
   module: {
     rules: [
       {
-        test: /\.ts(x?)$/,
-        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        loader: ["awesome-typescript-loader?module=es6"],
+        exclude: [/node_modules/],
+      },
+      {
+        test: /\.js$/,
+        loader: "source-map-loader",
+        enforce: "pre",
+      },
+      {
+        test: /\.html$/,
         use: [
           {
-            loader: "ts-loader",
+            loader: "html-loader",
+            options: { minimize: !isDevelopment },
           },
         ],
       },
-      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader",
-      },
     ],
   },
-
-  // When importing a module whose path matches one of the following, just
-  // assume a corresponding global variable exists and use that instead.
-  // This is important because it allows us to avoid bundling all of our
-  // dependencies, which allows browsers to cache those libraries between builds.
-  externals: {
-    react: "React",
-    "react-dom": "ReactDOM",
+  resolve: {
+    extensions: [".js", ".ts", ".tsx"],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/index.html",
+      filename: "./index.html",
+    }),
+    new CopyWebpackPlugin([
+      { from: "public", to: "dist" },
+      { from: "src/worker", to: "" },
+    ]),
+  ],
 };
+
+module.exports = config;

@@ -1,9 +1,23 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom";
 
-import { Hello } from "./components/hello";
+const App = () => <p>Hello, World!</p>;
 
-ReactDOM.render(
-  <Hello compiler="TypeScript" framework="React" />,
-  document.getElementById("example")
-);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./serviceWorker.js").then(
+      function (registration) {
+        console.log("Service worker registration scope:" + registration.scope);
+      },
+      function (err) {
+        console.log(err);
+      }
+    );
+  });
+}
+
+if (module.hot) {
+  module.hot.accept();
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
