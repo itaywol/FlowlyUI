@@ -2,9 +2,11 @@ FROM node:latest AS RUNNER
 
 WORKDIR /usr/src/app
 
-COPY . .
+COPY *.json ./
 
 RUN npm i
+
+COPY ./public ./public
 
 CMD npm start
 

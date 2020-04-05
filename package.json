@@ -25,7 +25,7 @@
     "typescript": "3.7.4"
   },
   "scripts": {
-    "start": "PORT=5858 react-scripts start",
+    "start": "PORT=5858 PUBLIC_URL=/ react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
