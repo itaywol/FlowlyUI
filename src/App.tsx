@@ -23,33 +23,44 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import { UserProvider } from "./providers/userProvider";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "@apollo/react-hooks";
+
+const client = new ApolloClient({
+  uri: "https://127.0.0.1:3000/graphql"
+});
 
 const App: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("");
 
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu selectedPage={selectedPage} />
-          <IonRouterOutlet id="main">
-            <Route
-              path="/page/:name"
-              render={(props) => {
-                setSelectedPage(props.match.params.name);
-                return <Page {...props} />;
-              }}
-              exact={true}
-            />
-            <Route
-              path="/"
-              render={() => <Redirect to="/page/Inbox" />}
-              exact={true}
-            />
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
-    </IonApp>
+    <ApolloProvider client={client}>
+      <UserProvider>
+        <IonApp>
+          <IonReactRouter>
+            <IonSplitPane contentId="main">
+              <Menu selectedPage={selectedPage} />
+              <IonRouterOutlet id="main">
+                <Route
+                  path="/page/:name"
+                  render={props => {
+                    setSelectedPage(props.match.params.name);
+                    return <Page {...props} />;
+                  }}
+                  exact={true}
+                />
+                <Route
+                  path="/"
+                  render={() => <Redirect to="/page/Inbox" />}
+                  exact={true}
+                />
+              </IonRouterOutlet>
+            </IonSplitPane>
+          </IonReactRouter>
+        </IonApp>
+      </UserProvider>
+    </ApolloProvider>
   );
 };
 
