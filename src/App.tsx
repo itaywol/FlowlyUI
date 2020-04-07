@@ -23,12 +23,12 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-import { UserProvider } from "./providers/userProvider";
+import { UserProvider } from "./providers/user/userProvider";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 
 const client = new ApolloClient({
-  uri: "https://127.0.0.1:3000/graphql"
+  uri: "https://127.0.0.1:3000/graphql",
 });
 
 const App: React.FC = () => {
@@ -44,7 +44,7 @@ const App: React.FC = () => {
               <IonRouterOutlet id="main">
                 <Route
                   path="/page/:name"
-                  render={props => {
+                  render={(props) => {
                     setSelectedPage(props.match.params.name);
                     return <Page {...props} />;
                   }}
