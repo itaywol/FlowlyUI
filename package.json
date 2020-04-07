@@ -19,6 +19,7 @@
     "@videojs/http-streaming": "1.13.2",
     "apollo-boost": "0.4.7",
     "graphql": "15.0.0",
+    "graphql-tag": "^2.10.3",
     "ionicons": "5.0.0",
     "node-sass": "4.13.1",
     "react": "16.12.0",

@@ -1,27 +1,26 @@
-
-import React, { Component, useContext } from 'react';
-import { Optionalize } from '../utils/Optionalize';
-import { useQuery } from '@apollo/react-hooks';
+import React, { Component, useContext } from "react";
+import { Optionalize } from "../../utils/Optionalize";
+import { useQuery } from "@apollo/react-hooks";
 
 interface User {
-    userName: string;
-    firstName: string;
-    lastName: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
 }
 
 declare namespace UserProviderState {
   interface Loading {
-    type: 'Loading';
+    type: "Loading";
   }
 
   interface Ready {
-    type: 'Ready';
+    type: "Ready";
     value: User | undefined;
     logout: () => void;
   }
 
   interface Failed {
-    type: 'Failed';
+    type: "Failed";
     error: any;
   }
 }
@@ -31,17 +30,19 @@ export type UserProviderState =
   | UserProviderState.Ready
   | UserProviderState.Failed;
 
-export const UserContext = React.createContext<UserProviderState>({ type: 'Loading' });
+export const UserContext = React.createContext<UserProviderState>({
+  type: "Loading",
+});
 
 export class UserProvider extends Component<{}, UserProviderState> {
   constructor(props: {}) {
     super(props);
 
-    this.state = { type: 'Loading' };
+    this.state = { type: "Loading" };
   }
 
   componentDidMount() {
-    this.refreshUser();  
+    this.refreshUser();
   }
 
   refreshUser() {
@@ -56,7 +57,11 @@ export class UserProvider extends Component<{}, UserProviderState> {
   }
 
   render() {
-    return <UserContext.Provider value={this.state}>{this.props.children}</UserContext.Provider>;
+    return (
+      <UserContext.Provider value={this.state}>
+        {this.props.children}
+      </UserContext.Provider>
+    );
   }
 }
 
