@@ -1,6 +1,8 @@
 import React, { Component, useContext } from "react";
 import { Optionalize } from "../../utils/Optionalize";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+import { ExecutionResult } from "@apollo/react-common";
 
 interface User {
   userName: string;
@@ -15,8 +17,11 @@ declare namespace UserProviderState {
 
   interface Ready {
     type: "Ready";
-    value: User | undefined;
-    logout: () => void;
+    user: User | undefined;
+    logout: () => Promise<ExecutionResult<void>>;
+    register: (email: string, password: string) => Promise<ExecutionResult<User | undefined>>;
+    login: (email: string, password: string) => Promise<ExecutionResult<User | undefined>>;
+    refresh: () => Promise<ExecutionResult<User | undefined>>;
   }
 
   interface Failed {
@@ -31,7 +36,7 @@ export type UserProviderState =
   | UserProviderState.Failed;
 
 export const UserContext = React.createContext<UserProviderState>({
-  type: "Loading",
+  type: "Loading"
 });
 
 export class UserProvider extends Component<{}, UserProviderState> {
@@ -42,19 +47,67 @@ export class UserProvider extends Component<{}, UserProviderState> {
   }
 
   componentDidMount() {
-    this.refreshUser();
+    this.refresh();
   }
 
-  refreshUser() {
-    // this.props
-    // .getUser()
-    // .then((response) => this.setState({ type: 'Ready', value: response }))
-    // .catch((error) => this.setState({ type: 'Failed', error: error }));
+  refresh() {
+    const [invoke, result] = useMutation(gql`
+      mutation get() {
+        get() {
+          message
+        }
+      }
+    `);
+
+    return invoke().then((data) => {
+      // TODO: FIX INTERFACES
+      this.setState({type: "Ready",
+                     user: data.data as User,
+                     logout: this.logout,
+                     register: this.register,
+                     login: this.login,
+                     refresh: this.refresh
+                    });
+      return (data.data);
+    });
   }
 
-  getChildContext() {
-    return { covid: this.state };
+  logout() {
+    const [invoke] = useMutation<void>(gql`
+      mutation logout() {
+        logout() {
+          message
+        }
+      }
+    `);
+
+    return invoke();
   }
+
+  register(email: string, password: string) {
+    const [invoke] = useMutation(gql`
+      mutation register($data: credentialsInput!) {
+        register(data: $data) {
+          message
+        }
+      }
+    `);
+
+    return invoke({variables: {data: {email, password}}});
+  }
+
+  login(email: string, password: string) {
+    const [invoke] = useMutation<User | undefined>(gql`
+      mutation login($data: credentialsInput!) {
+        login(data: $data) {
+          message
+        }
+      }
+    `);
+
+    return invoke({variables: {data: {email, password}}});
+  }
+
 
   render() {
     return (
@@ -69,7 +122,7 @@ export interface WithUserProps {
   user: UserProviderState;
 }
 
-export function withCovid<T extends WithUserProps = WithUserProps>(
+export function withUser<T extends WithUserProps = WithUserProps>(
   WrappedComponent: React.ComponentType<T>
 ) {
   return (props: Optionalize<T, WithUserProps>) => {
