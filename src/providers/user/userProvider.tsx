@@ -1,6 +1,6 @@
-import React, { Component, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Optionalize } from "../../utils/Optionalize";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { ExecutionResult } from "@apollo/react-common";
 
@@ -19,8 +19,14 @@ declare namespace UserProviderState {
     type: "Ready";
     user: User | undefined;
     logout: () => Promise<ExecutionResult<void>>;
-    register: (email: string, password: string) => Promise<ExecutionResult<User | undefined>>;
-    login: (email: string, password: string) => Promise<ExecutionResult<User | undefined>>;
+    register: (
+      email: string,
+      password: string
+    ) => Promise<ExecutionResult<User | undefined>>;
+    login: (
+      email: string,
+      password: string
+    ) => Promise<ExecutionResult<User | undefined>>;
     refresh: () => Promise<ExecutionResult<User | undefined>>;
   }
 
@@ -36,87 +42,79 @@ export type UserProviderState =
   | UserProviderState.Failed;
 
 export const UserContext = React.createContext<UserProviderState>({
-  type: "Loading"
+  type: "Loading",
 });
 
-export class UserProvider extends Component<{}, UserProviderState> {
-  constructor(props: {}) {
-    super(props);
+export const UserProvider: React.FunctionComponent = ({ children }) => {
+  const [user, setUser] = useState<UserProviderState>({ type: "Loading" });
 
-    this.state = { type: "Loading" };
-  }
+  //TODO: for all of the custom hooks must define return type
+  // REACT RULE: all hooks must be typed like useXXXXX
+  const useRefresh: any = () => {
+    const [invoke, result] = useLazyQuery(gql`
+      query get {
+        get {
+          id: _id
+          email
+        }
+      }
+    `);
+    useEffect(() => {
+      invoke();
+    }, []);
 
-  componentDidMount() {
-    this.refresh();
-  }
+    useEffect(() => {
+      if (result.data && result.called === true) {
+        console.log("refresh");
+        setUser({
+          type: "Ready",
+          user: result.data.get as User,
+          logout: useLogout,
+          register: useRegister,
+          login: useLogin,
+          refresh: useRefresh,
+        });
+      }
+    }, [result.data, result.called]);
 
-  refresh() {
+    return result.data;
+  };
+  useRefresh();
+
+  const useLogout: any = () => {
+    const [invoke, result] = useMutation<void>(gql`
+      query logout {
+        logout
+      }
+    `);
+
+    invoke();
+    return result.data;
+  };
+
+  const useRegister: any = (email: string, password: string) => {
     const [invoke, result] = useMutation(gql`
-      mutation get() {
-        get() {
-          message
-        }
-      }
-    `);
-
-    return invoke().then((data) => {
-      // TODO: FIX INTERFACES
-      this.setState({type: "Ready",
-                     user: data.data as User,
-                     logout: this.logout,
-                     register: this.register,
-                     login: this.login,
-                     refresh: this.refresh
-                    });
-      return (data.data);
-    });
-  }
-
-  logout() {
-    const [invoke] = useMutation<void>(gql`
-      mutation logout() {
-        logout() {
-          message
-        }
-      }
-    `);
-
-    return invoke();
-  }
-
-  register(email: string, password: string) {
-    const [invoke] = useMutation(gql`
       mutation register($data: credentialsInput!) {
-        register(data: $data) {
-          message
-        }
+        register(data: $data)
+      }
+    `);
+    invoke({ variables: { data: { email, password } } });
+    return result.data;
+  };
+
+  const useLogin: any = (email: string, password: string) => {
+    const [invoke, result] = useMutation<User | undefined>(gql`
+      query login($data: credentialsInput!) {
+        login(data: $data)
       }
     `);
 
-    return invoke({variables: {data: {email, password}}});
-  }
+    invoke({ variables: { data: { email, password } } });
+    return result.data;
+  };
 
-  login(email: string, password: string) {
-    const [invoke] = useMutation<User | undefined>(gql`
-      mutation login($data: credentialsInput!) {
-        login(data: $data) {
-          message
-        }
-      }
-    `);
-
-    return invoke({variables: {data: {email, password}}});
-  }
-
-
-  render() {
-    return (
-      <UserContext.Provider value={this.state}>
-        {this.props.children}
-      </UserContext.Provider>
-    );
-  }
-}
+  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+};
 
 export interface WithUserProps {
   user: UserProviderState;
