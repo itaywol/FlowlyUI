@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import "./ExploreContainer.css";
 
@@ -7,18 +7,6 @@ interface ContainerProps {
 }
 
 const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
-  const videoJsOptions = {
-    autoplay: true,
-    controls: true,
-    width: 350,
-    height: 225,
-    sources: [
-      {
-        src: "http://192.168.1.108:8080/live/123.m3u8",
-        type: "application/vnd.apple.mpegurl",
-      },
-    ],
-  };
   return (
     <div className="container">
       <strong>{name}</strong>
@@ -32,7 +20,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
           UI Components
         </a>
       </p>
-      <VideoPlayer {...videoJsOptions} />
     </div>
   );
 };
