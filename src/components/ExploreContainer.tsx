@@ -54,7 +54,7 @@ const ChannelContainer: React.FC<WithUserProps & { id: string }> = ({
   user,
   id,
 }) => {
-  if (user.type === "Ready") {
+  if (user.type === "Ready" && (id || user?.user?.id)) {
     const videoOptions: videojs.VideoJsPlayerOptions = {
       controls: true,
       autoplay: true,
