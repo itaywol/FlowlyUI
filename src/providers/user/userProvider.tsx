@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import { ExecutionResult } from "@apollo/react-common";
 
 interface User {
+  id: string;
   userName: string;
   firstName: string;
   lastName: string;

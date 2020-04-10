@@ -24,6 +24,7 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import { UserProvider } from "./providers/user/userProvider";
+import { PerformerProvider } from "./providers/performers/performersProvider";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 
@@ -37,28 +38,38 @@ const App: React.FC = () => {
   return (
     <ApolloProvider client={client}>
       <UserProvider>
-        <IonApp>
-          <IonReactRouter>
-            <IonSplitPane contentId="main">
-              <Menu selectedPage={selectedPage} />
-              <IonRouterOutlet id="main">
-                <Route
-                  path="/page/:name"
-                  render={(props) => {
-                    setSelectedPage(props.match.params.name);
-                    return <Page {...props} />;
-                  }}
-                  exact={true}
-                />
-                <Route
-                  path="/"
-                  render={() => <Redirect to="/page/Inbox" />}
-                  exact={true}
-                />
-              </IonRouterOutlet>
-            </IonSplitPane>
-          </IonReactRouter>
-        </IonApp>
+        <PerformerProvider>
+          <IonApp>
+            <IonReactRouter>
+              <IonSplitPane contentId="main">
+                <Menu selectedPage={selectedPage} />
+                <IonRouterOutlet id="main">
+                  <Route
+                    path="/:name"
+                    render={(props) => {
+                      setSelectedPage(props.match.params.name);
+                      return <Page {...props} />;
+                    }}
+                    exact={true}
+                  />
+                  <Route
+                    path="/:name/:id"
+                    render={(props) => {
+                      setSelectedPage(props.match.params.name);
+                      return <Page {...props} />;
+                    }}
+                    exact={true}
+                  />
+                  <Route
+                    path="/"
+                    render={() => <Redirect to="/Home" />}
+                    exact={true}
+                  />
+                </IonRouterOutlet>
+              </IonSplitPane>
+            </IonReactRouter>
+          </IonApp>
+        </PerformerProvider>
       </UserProvider>
     </ApolloProvider>
   );
