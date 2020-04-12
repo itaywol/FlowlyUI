@@ -33,7 +33,7 @@ const Page: React.FC<RouteComponentProps<{
             <IonTitle size="large">{match.params.name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name={match.params.name} id={match.params.id} />
+        <ExploreContainer name={match.params.name} />
       </IonContent>
     </IonPage>
   );
