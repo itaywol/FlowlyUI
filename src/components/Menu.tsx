@@ -38,7 +38,7 @@ const appPages: AppPage[] = [
     mdIcon: compassOutline,
   },
   {
-    title: "My Channel",
+    title: "Channel",
     url: "/Channel",
     iosIcon: cameraOutline,
     mdIcon: cameraOutline,

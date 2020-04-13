@@ -1,3 +1,14 @@
 ion-content ion-toolbar {
   --background: transparent;
 }
+
+.top-toolbar {
+    padding-bottom: 7px;
+}
+.top-toolbar-icons {
+    margin-left:20px!important;
+}
+.top-toolbar-avatar {
+    width: 35px;
+    height:35px;
+}

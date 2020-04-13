@@ -1,16 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./ExploreContainer.css";
-import VideoPlayer from "./VideoPlayer";
-import {
-  UserProvider,
-  withUser,
-  WithUserProps,
-} from "../providers/user/userProvider";
-import {
-  withPerformers,
-  WithPerformersProps,
-} from "../providers/performers/performersProvider";
-import { IonList, IonItem, IonLabel } from "@ionic/react";
 
 interface ContainerProps {
   name: string;
@@ -27,17 +16,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
     {
       title: "Home",
       url: "/Home",
-      Content: () => null,
+      Content: () => <>Home</>,
     },
     {
       title: "Explore",
       url: "/Explore",
-      Content: () => null,
+      Content: () => <>Explore</>,
     },
     {
       title: "Channel",
       url: "/Channel",
-      Content: () => null,
+      Content: () => <>Channel</>,
     },
   ];
 
