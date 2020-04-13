@@ -68,12 +68,14 @@ const LandingPage: React.FC<{ continue: any }> = (props) => {
 // TODO: authentication check based on request
 // TODO: landed check based on localStorage
 const App: React.FC = () => {
-  const [landed, setLanded] = useState<boolean>(false);
+  const [landed, setLanded] = useState<boolean>(
+    JSON.parse(localStorage.getItem("performaLanded") || "false")
+  );
   const [selectedPage, setSelectedPage] = useState<string>("");
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
   return (
     <IonApp>
-      {!landed && !isAuthenticated && <LandingPage continue={setLanded} />}
+      {!landed && <LandingPage continue={setLanded} />}
       {landed && !isAuthenticated && (
         <IonContent>
           <IonButton onClick={() => setAuthenticated(true)}>
@@ -81,7 +83,7 @@ const App: React.FC = () => {
           </IonButton>
         </IonContent>
       )}
-      {landed && isAuthenticated && (
+      {isAuthenticated && (
         <IonReactRouter>
           <IonRouterOutlet id="main">
             <Route
