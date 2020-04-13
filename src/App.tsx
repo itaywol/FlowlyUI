@@ -1,16 +1,12 @@
 import {
   IonApp,
-  IonContent,
-  IonSlides,
-  IonSlide,
-  IonPage,
-  IonHeader,
-  IonTitle,
   IonButton,
-  IonSplitPane,
-  IonMenu,
+  IonContent,
+  IonPage,
   IonRouterOutlet,
-  IonModal,
+  IonSlide,
+  IonSlides,
+  IonSplitPane,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 /* Core CSS required for Ionic components to work properly */
@@ -26,44 +22,16 @@ import "@ionic/react/css/structure.css";
 import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/typography.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Redirect, Route } from "react-router";
+import Menu from "./components/Menu";
+import useAuthenticationValidation from "./hooks/useAuthenticationValidation";
+import Page from "./pages/Page";
 import Tabs from "./tabs/tabs";
 /* Theme variables */
 import "./theme/variables.css";
-import Menu from "./components/Menu";
-import { Route, Redirect } from "react-router";
-import Page from "./pages/Page";
-
-const LandingPage: React.FC<{ continue: any }> = (props) => {
-  return (
-    <IonContent fullscreen class="ion-padding" scroll-y={false}>
-      <IonSlides
-        pager={true}
-        options={{ initialSlide: 0, speed: 400 }}
-        style={{ height: "100%" }}
-      >
-        <IonSlide>
-          <div className="slide">
-            <h2>Welcome</h2>
-          </div>
-        </IonSlide>
-        <IonSlide>
-          <h1>This is Performa</h1>
-        </IonSlide>
-        <IonSlide>
-          <IonButton
-            onClick={() => {
-              localStorage.setItem("performaLanded", "true");
-              props.continue(true);
-            }}
-          >
-            Continue!
-          </IonButton>
-        </IonSlide>
-      </IonSlides>
-    </IonContent>
-  );
-};
+import LandingPage from "./components/LandingPage/LandingPage";
+import useFetch from "./hooks/useFetch";
 
 // TODO: authentication check based on request
 // TODO: landed check based on localStorage
@@ -72,17 +40,11 @@ const App: React.FC = () => {
     JSON.parse(localStorage.getItem("performaLanded") || "false")
   );
   const [selectedPage, setSelectedPage] = useState<string>("");
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+  const isAuthenticated = useAuthenticationValidation() || false;
   return (
     <IonApp>
       {!landed && <LandingPage continue={setLanded} />}
-      {landed && !isAuthenticated && (
-        <IonContent>
-          <IonButton onClick={() => setAuthenticated(true)}>
-            yada yada yada perform login or register
-          </IonButton>
-        </IonContent>
-      )}
+      {landed && !isAuthenticated && <IonContent>login or register</IonContent>}
       {isAuthenticated && (
         <IonReactRouter>
           <IonRouterOutlet id="main">
