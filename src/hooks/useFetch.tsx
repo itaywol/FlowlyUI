@@ -1,38 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 axios.defaults.withCredentials = true;
 
-interface fetchResponse {
-  data: AxiosResponse | undefined;
+export interface IUseFetch {
+  response: any;
   loading: boolean;
-  error: AxiosError | undefined;
-  called: boolean;
+  error: boolean;
 }
 
-interface baseParams {
-  url: string;
-  options: AxiosRequestConfig;
-}
-
-type fetchHook = () => [(arg0: baseParams) => Promise<void>, fetchResponse];
-
-const useFetch: fetchHook = () => {
+type useFetchHook<T> = [
+  React.Dispatch<React.SetStateAction<AxiosRequestConfig | undefined>>,
+  {
+    response: AxiosResponse<T> | AxiosError<T> | undefined;
+    loading: boolean;
+    error: boolean;
+    called: boolean;
+  }
+];
+export function useFetch<T>(): useFetchHook<T> {
+  const [response, setResponse] = useState<AxiosResponse<T> | AxiosError<T>>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
   const [called, setCalled] = useState<boolean>(false);
-  const [data, setData] = useState<AxiosResponse>();
-  const [error, setError] = useState<AxiosError>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const invoke = async (arg0: baseParams) => {
-    const { url, options } = arg0;
-    setCalled(true);
-    setLoading(true);
-    axios(url, options)
-      .then((response) => setData(response))
-      .catch((error) => setData(error));
-    setLoading(false);
-  };
+  const [axiosRequest, setAxiosRequest] = useState<AxiosRequestConfig>();
 
-  const hookResponse: fetchResponse = { data, loading, error, called };
-  return [invoke, hookResponse];
-};
+  useEffect(() => {
+    let mounted = true;
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+    setCalled(false);
+    if (axiosRequest && mounted) {
+      setCalled(true);
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          const response = await axios(axiosRequest);
+          if (response.status === 200 && !signal.aborted) {
+            setResponse(response.data);
+          }
+        } catch (err) {
+          if (!signal.aborted) {
+            setResponse(err);
+            setError(true);
+          }
+        } finally {
+          if (!signal.aborted) {
+            setLoading(false);
+          }
+        }
+      };
+      fetchData();
+    }
 
+    return () => {
+      mounted = false;
+      setCalled(false);
+      abortController.abort();
+    };
+  }, [axiosRequest]);
+
+  return [setAxiosRequest, { response, loading, error, called }];
+}
 export default useFetch;
