@@ -23,6 +23,7 @@
     "axios": "0.19.2",
     "immer": "^6.0.3",
     "braintree-web": "^3.60.0",
+    "braintree-web-drop-in-react": "^1.1.1",
     "ionicons": "5.0.0",
     "node-sass": "4.13.1",
     "react": "16.12.0",

@@ -11,14 +11,14 @@ export interface IUseFetch {
 type useFetchHook<T> = [
   React.Dispatch<React.SetStateAction<AxiosRequestConfig | undefined>>,
   {
-    response: AxiosResponse<T> | AxiosError<T> | undefined;
+    response: T | undefined;
     loading: boolean;
     error: boolean;
     called: boolean;
   }
 ];
 export function useFetch<T>(): useFetchHook<T> {
-  const [response, setResponse] = useState<AxiosResponse<T> | AxiosError<T>>();
+  const [response, setResponse] = useState<T>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [called, setCalled] = useState<boolean>(false);
@@ -35,7 +35,10 @@ export function useFetch<T>(): useFetchHook<T> {
         try {
           setLoading(true);
           const response = await axios(axiosRequest);
-          if (response.status === 200 && !signal.aborted) {
+          if (
+            (response.status >= 200 || response.status < 300) &&
+            !signal.aborted
+          ) {
             setResponse(response.data);
           }
         } catch (err) {
