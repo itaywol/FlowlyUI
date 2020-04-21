@@ -60,6 +60,7 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
             routerDirection="none"
             lines="none"
             detail={false}
+            button={true}
           >
             <IonIcon slot="start" icon={logOut} />
             <IonLabel>{"Logout"}</IonLabel>

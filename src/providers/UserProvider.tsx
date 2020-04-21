@@ -1,6 +1,7 @@
 import React, { Component, useContext } from "react";
 import { Optionalize } from "../utils/Optionalize";
-import { http, HttpResponse } from "../utils/http";
+import { CreateUserDTO } from "../interfaces/user";
+import Axios, { AxiosResponse } from "axios";
 
 interface User {
   userName: string;
@@ -16,10 +17,13 @@ declare namespace UserProviderState {
   interface Ready {
     type: "Ready";
     user: User | undefined;
-    logout: () => Promise<HttpResponse<void>>;
-    register: (email: string, password: string) => Promise<HttpResponse<User | undefined>>;
-    login: (email: string, password: string) => Promise<HttpResponse<User | undefined>>;
-    refresh: () => Promise<HttpResponse<User | undefined>>;
+    logout: () => Promise<AxiosResponse<void>>;
+    register: (data: CreateUserDTO) => Promise<AxiosResponse<User | undefined>>;
+    login: (
+      email: string,
+      password: string
+    ) => Promise<AxiosResponse<User | undefined>>;
+    refresh: () => Promise<AxiosResponse<User | undefined>>;
   }
 
   interface Failed {
@@ -45,33 +49,69 @@ export class UserProvider extends Component<{}, UserProviderState> {
     this.refresh();
   }
 
-  refresh() {
-    return http.get<User>("/api/auth").then((data) => {
+  refresh = () => {
+    this.setState({type: "Loading"});
+    return Axios.get<User>("/api/auth").then(data => {
+      debugger;
       this.setState({
         type: "Ready",
         login: this.login,
         logout: this.logout,
         refresh: this.refresh,
         register: this.register,
-        user: data.parsedBody
+        user: data.data
       });
-      
-      return (data);
+
+      return data;
     });
   }
 
-  logout() {
-    return http.del<void>("/api/auth");
+  logout = () => {
+    this.setState({type: "Loading"});
+    return Axios.delete<void>("/api/auth").then(data => {
+      this.setState({
+        type: "Ready",
+        login: this.login,
+        logout: this.logout,
+        refresh: this.refresh,
+        register: this.register,
+        user: undefined
+      });
+      return data;
+    });
   }
 
-  register() {
-    return http.post<User | undefined>("/api/auth");
+  register = (data: CreateUserDTO) => {
+    this.setState({type: "Loading"});
+    return Axios.post<User | undefined>("/api/user", data).then(data => {
+      this.setState({
+        type: "Ready",
+        login: this.login,
+        logout: this.logout,
+        refresh: this.refresh,
+        register: this.register,
+        user: data.data
+      });
+
+      return data;
+    });
   }
 
-  login() {
-    return http.post<User>("/api/auth");
-  }
+  login = () => {
+    this.setState({type: "Loading"});
+    return Axios.post<User>("/api/auth").then(data => {
+      this.setState({
+        type: "Ready",
+        login: this.login,
+        logout: this.logout,
+        refresh: this.refresh,
+        register: this.register,
+        user: data.data
+      });
 
+      return data;
+    });
+  }
 
   render() {
     return (
