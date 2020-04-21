@@ -4,7 +4,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonListHeader,
   IonMenu,
   IonMenuToggle,
 } from "@ionic/react";
@@ -12,6 +11,7 @@ import { compassOutline, homeOutline, cameraOutline } from "ionicons/icons";
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import "./Menu.css";
+import { UserMenu } from "./UserMenu";
 
 interface MenuProps extends RouteComponentProps {
   selectedPage: string;
@@ -27,19 +27,19 @@ interface AppPage {
 const appPages: AppPage[] = [
   {
     title: "Home",
-    url: "/Home",
+    url: "/home",
     iosIcon: homeOutline,
     mdIcon: homeOutline,
   },
   {
     title: "Explore",
-    url: "/Explore",
+    url: "/explore",
     iosIcon: compassOutline,
     mdIcon: compassOutline,
   },
   {
     title: "Channel",
-    url: "/Channel",
+    url: "/channel",
     iosIcon: cameraOutline,
     mdIcon: cameraOutline,
   },
@@ -49,8 +49,8 @@ const Menu: React.FunctionComponent<MenuProps> = ({ selectedPage }) => {
   return (
     <IonMenu contentId="main" type="overlay">
       <IonContent>
-        <IonList id="inbox-list">
-          <IonListHeader>Performa</IonListHeader>
+        <IonList>
+          <UserMenu selectedPage={selectedPage}/>
           {appPages.map((appPage, index) => {
             return (
               <IonMenuToggle key={index} autoHide={false}>

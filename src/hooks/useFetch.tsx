@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 axios.defaults.withCredentials = true;
 
@@ -19,7 +19,7 @@ type fetchHook = () => [(arg0: baseParams) => Promise<void>, fetchResponse];
 const useFetch: fetchHook = () => {
   const [called, setCalled] = useState<boolean>(false);
   const [data, setData] = useState<AxiosResponse>();
-  const [error, setError] = useState<AxiosError>();
+  const [error] = useState<AxiosError>();
   const [loading, setLoading] = useState<boolean>(false);
   const invoke = async (arg0: baseParams) => {
     const { url, options } = arg0;

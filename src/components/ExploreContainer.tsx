@@ -15,17 +15,17 @@ const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
   const containerContents: ContainerContent[] = [
     {
       title: "Home",
-      url: "/Home",
+      url: "/home",
       Content: () => <>Home</>,
     },
     {
       title: "Explore",
-      url: "/Explore",
+      url: "/explore",
       Content: () => <>Explore</>,
     },
     {
       title: "Channel",
-      url: "/Channel",
+      url: "/channel",
       Content: () => <>Channel</>,
     },
   ];
