@@ -27,8 +27,8 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
       </div>;
     case "Ready":
       const userReady = props.user;
-
-      if (props.user.user === undefined) {
+      
+      if (props.user.user === null) {
         return (
           <>
             <IonItem

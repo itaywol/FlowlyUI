@@ -8,7 +8,8 @@ import {
   IonToolbar,
   IonInput,
   IonButton,
-  IonSpinner
+  IonSpinner,
+  IonAlert
 } from "@ionic/react";
 import React, { useState } from "react";
 import "./Login.css";
@@ -21,21 +22,32 @@ interface LoginProps {
 interface LoginState {
   email: string;
   password: string;
+  redirect?: string;
 }
 
 const LoginPageComponent: React.FunctionComponent<LoginProps> = (
   props: LoginProps
 ) => {
   const [state, setState] = useState<LoginState>({ email: "", password: "" });
+  const [showAlert, setShowAlert] = useState<string | false>(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (props.user.type === "Ready") {
-      props.user.login(state.email, state.password);
+      const result = await props.user.login(state.email, state.password);
+
+      if (result === null) {
+        setShowAlert("Error logging in. Try again.");
+      } else {
+        setState(prevState => {
+          prevState.redirect = "/home";
+          return prevState;
+        });
+      }
     }
   };
-  
+
   return (
     <IonPage>
       <IonHeader>
@@ -48,6 +60,13 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
       </IonHeader>
 
       <IonContent>
+        <IonAlert
+          isOpen={showAlert !== false}
+          onDidDismiss={() => setShowAlert(false)}
+          header={"Error"}
+          message={showAlert !== false ? showAlert : ""}
+          buttons={["Ok"]}
+        />
         {props.user.type === "Ready" ? (
           <form className="LoginPage__container" onSubmit={onSubmit}>
             <IonInput

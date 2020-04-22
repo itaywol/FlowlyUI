@@ -33,8 +33,7 @@ const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
   const [state, setState] = useState<RegisterState>({
     email: "",
     password: "",
-    nickName: "",
-    redirect: undefined
+    nickName: ""
   });
   const [showAlert, setShowAlert] = useState<string | false>(false);
 
@@ -57,6 +56,9 @@ const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
         switch (e.response.status) {
           case 401:
             setShowAlert("Error creating user, try another nickname or email.");
+            break;
+          default:
+            setShowAlert("Unknown error, might be internet connection.");
             break;
         }
       }
