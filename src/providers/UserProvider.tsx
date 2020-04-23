@@ -3,10 +3,18 @@ import { Optionalize } from "../utils/Optionalize";
 import { CreateUserDTO } from "../interfaces/user";
 import Axios, { AxiosResponse } from "axios";
 
+interface Balance {
+  currentBalance: number;
+}
+
 interface User {
-  userName: string;
+  email: string;
+  nickName: string;
+  id: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string;
+  balance: Balance;
 }
 
 declare namespace UserProviderState {
@@ -35,7 +43,7 @@ export type UserProviderState =
   | UserProviderState.Failed;
 
 export const UserContext = React.createContext<UserProviderState>({
-  type: "Loading"
+  type: "Loading",
 });
 
 export class UserProvider extends Component<{}, UserProviderState> {
@@ -57,7 +65,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: data
+        user: data,
       });
 
       result = data;
@@ -67,7 +75,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
           this.setState({
             type: "Ready",
             ...this.getFunctions(),
-            user: null
+            user: null,
           });
           break;
         default:
@@ -81,11 +89,11 @@ export class UserProvider extends Component<{}, UserProviderState> {
 
   logout = () => {
     this.setState({ type: "Loading" });
-    return Axios.delete<void>("/api/auth").then(data => {
+    return Axios.delete<void>("/api/auth").then((data) => {
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: undefined
+        user: undefined,
       });
       return data;
     });
@@ -93,11 +101,11 @@ export class UserProvider extends Component<{}, UserProviderState> {
 
   register = (data: CreateUserDTO) => {
     this.setState({ type: "Loading" });
-    return Axios.post<User>("/api/user", data).then(data => {
+    return Axios.post<User>("/api/user", data).then((data) => {
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: data.data
+        user: data.data,
       });
 
       return data;
@@ -110,12 +118,13 @@ export class UserProvider extends Component<{}, UserProviderState> {
     let result = null;
 
     try {
-      const data = (await Axios.post<User>("/api/auth", {email, password})).data;
+      const data = (await Axios.post<User>("/api/auth", { email, password }))
+        .data;
 
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: data
+        user: data,
       });
 
       result = data;
@@ -125,7 +134,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
           this.setState({
             type: "Ready",
             ...this.getFunctions(),
-            user: null
+            user: null,
           });
           break;
         default:
@@ -142,7 +151,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
       login: this.login,
       logout: this.logout,
       refresh: this.refresh,
-      register: this.register
+      register: this.register,
     };
   }
 

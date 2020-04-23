@@ -25,6 +25,8 @@ import "./theme/variables.css";
 import { UserProvider } from "./providers/UserProvider";
 import { LoginPage } from "./pages/Login/Login";
 import { RegisterPage } from "./pages/Register/Register";
+import { ProfilePage } from "./pages/Profile/Profile";
+import { PaymentPage } from "./pages/Payment/Payment";
 
 const App: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -49,6 +51,22 @@ const App: React.FC = () => {
                 render={() => {
                   setSelectedPage("register");
                   return <RegisterPage />;
+                }}
+                exact={true}
+              />
+              <Route
+                path="/profile"
+                render={() => {
+                  setSelectedPage("profile");
+                  return <ProfilePage />;
+                }}
+                exact={true}
+              />
+              <Route
+                path="/payment"
+                render={() => {
+                  setSelectedPage("payment");
+                  return <PaymentPage />;
                 }}
                 exact={true}
               />
