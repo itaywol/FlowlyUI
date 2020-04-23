@@ -12,9 +12,10 @@ import {
   IonCardContent,
   IonButton,
   IonCardSubtitle,
+  IonCardTitle,
 } from "@ionic/react";
 import { useImmer } from "use-immer";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Payment.scss";
 import { UserProviderState, withUser } from "../../providers/UserProvider";
 import assertNever from "assert-never";
@@ -25,63 +26,19 @@ import Axios from "axios";
 interface ProfileProps {
   user: UserProviderState;
 }
-//const TestPaymentPage = () => {
-//const [nounce, setNounce] = useState();
-//const [getToken, { token }] = useBraintree();
-//const [braintreeInstance, setInstance] = useState();
-//const [login] = useFetch();
-//const [buy] = useFetch();
-
-//function doPayment() {
-//if (braintreeInstance) {
-//braintreeInstance
-//?.requestPaymentMethod()
-//.then((response: any) => setNounce(response.nonce));
-//}
-//}
-
-//useEffect(() => {
-//if (!token) getToken();
-//if (nounce) {
-//buy({
-//url: "/api/payment/checkout",
-//method: "post",
-//data: { payment_method_nounce: nounce, paymentAmount: 10 },
-//});
-//}
-//}, [token, nounce]);
-
-//return (
-//<>
-//{token && (
-//<div>
-//<DropIn
-//options={{
-//authorization: token,
-//paypal: { flow: "checkout", amount: "10.0", currency: "USD" },
-//}}
-//onInstance={(instance) => setInstance(instance)}
-///>
-//<IonButton onClick={doPayment}>Submit Payment</IonButton>
-//</div>
-//)}
-//</>
-//);
-//};
 
 const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
   props: ProfileProps
 ) => {
   const [getToken, respToken] = useBraintree();
+  const [instance, setInstance] = useState();
   const [state, setState] = useImmer<{
     nonce: string | undefined;
-    token: string | undefined;
-    instance: any | undefined;
-  }>({ instance: undefined, nonce: undefined, token: undefined });
+  }>({ nonce: "" });
 
   function doPayment() {
-    if (state.instance) {
-      state.instance?.requestPaymentMethod().then((response: any) =>
+    if (instance) {
+      instance?.requestPaymentMethod().then((response: any) =>
         setState((draft) => {
           draft.nonce = response.nonce;
         })
@@ -90,21 +47,18 @@ const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
   }
 
   function updateInstance(instance: any) {
-    setState((draft) => {
-      draft.instance = instance;
-    });
+    if (instance) setInstance(instance);
   }
 
   useEffect(() => {
-    if (!state.token) getToken();
-    if (respToken.token) setState((draft) => (draft.token = respToken.token));
+    if (!respToken.token) getToken();
     if (state.nonce) {
       Axios.post("/api/payment/checkout", {
         payment_method_nounce: state.nonce,
         paymentAmount: 10,
       });
     }
-  }, [state.token, state.nonce, respToken]);
+  }, [state.nonce]);
 
   if (props.user.type === "Loading" || props.user.type === "Failed")
     return <></>;
@@ -114,26 +68,19 @@ const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
       {props.user.user && (
         <IonCard>
           <IonCardHeader>
-            <IonTitle>Hello {props.user.user?.nickName}</IonTitle>
-            <IonCardSubtitle>
-              eBalance: {props.user.user?.balance.currentBalance}
-            </IonCardSubtitle>
+            <IonCardTitle>Charge your account</IonCardTitle>
           </IonCardHeader>
+          <IonCardContent></IonCardContent>
           <IonCardContent>
-            {state.token[1].token && (
+            {respToken.token && (
               <div>
                 <DropIn
-                  options={{
-                    authorization: state.token[1].token,
-                    paypal: {
-                      flow: "checkout",
-                      amount: "10.0",
-                      currency: "USD",
-                    },
-                  }}
+                  options={{ authorization: respToken.token }}
                   onInstance={(instance: any) => updateInstance(instance)}
                 />
-                <IonButton onClick={doPayment}>Submit Payment</IonButton>
+                <IonButton onClick={() => doPayment()}>
+                  Submit Payment
+                </IonButton>
               </div>
             )}
           </IonCardContent>
