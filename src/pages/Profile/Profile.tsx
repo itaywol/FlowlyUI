@@ -12,6 +12,7 @@ import {
   IonCardContent,
   IonButton,
   IonCardSubtitle,
+  IonCardTitle,
 } from "@ionic/react";
 import React from "react";
 import "./Profile.scss";
@@ -31,7 +32,7 @@ const ProfilePageContent: React.FunctionComponent<ProfileProps> = (
     props.user.user && (
       <IonCard>
         <IonCardHeader>
-          <IonTitle>Hello {props.user.user?.nickName}</IonTitle>
+          <IonCardTitle>Hello {props.user.user?.nickName}</IonCardTitle>
           <IonCardSubtitle>
             eBalance: {props.user.user?.balance.currentBalance}
           </IonCardSubtitle>

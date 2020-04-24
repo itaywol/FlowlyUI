@@ -13,6 +13,9 @@ import {
   IonButton,
   IonCardSubtitle,
   IonCardTitle,
+  IonGrid,
+  IonCol,
+  IonRow,
 } from "@ionic/react";
 import { useImmer } from "use-immer";
 import React, { useEffect, useState } from "react";
@@ -27,6 +30,15 @@ interface ProfileProps {
   user: UserProviderState;
 }
 
+interface PaymentPlan {
+  price: number;
+  worth: {
+    balance: number;
+    bonus: number;
+    total: number;
+  };
+}
+
 const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
   props: ProfileProps
 ) => {
@@ -34,7 +46,17 @@ const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
   const [instance, setInstance] = useState();
   const [state, setState] = useImmer<{
     nonce: string | undefined;
-  }>({ nonce: "" });
+    payWithPaymentPlan: boolean;
+    paymentPlans: PaymentPlan[] | undefined;
+    selectedPlan: number | undefined;
+    paymentFreeAmount: number;
+  }>({
+    nonce: "",
+    paymentPlans: undefined,
+    selectedPlan: undefined,
+    payWithPaymentPlan: true,
+    paymentFreeAmount: 0,
+  });
 
   function doPayment() {
     if (instance) {
@@ -52,11 +74,24 @@ const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
 
   useEffect(() => {
     if (!respToken.token) getToken();
-    if (state.nonce) {
-      Axios.post("/api/payment/checkout", {
-        payment_method_nounce: state.nonce,
-        paymentAmount: 10,
+    if (!state.paymentPlans) {
+      Axios.get("/api/payment/plan").then((response) => {
+        setState((draft) => {
+          draft.paymentPlans = response.data;
+        });
       });
+    }
+    if (state.nonce && state.selectedPlan && state.paymentPlans) {
+      if (state.payWithPaymentPlan)
+        Axios.post("/api/payment/checkout", {
+          payment_method_nounce: state.nonce,
+          paymentPlanID: state.paymentPlans[state.selectedPlan],
+        });
+      else
+        Axios.post("/api/payment/checkout", {
+          payment_method_nounce: state.nonce,
+          paymentAmount: state.paymentPlans[state.selectedPlan],
+        });
     }
   }, [state.nonce]);
 
@@ -70,7 +105,59 @@ const PaymentPageContent: React.FunctionComponent<ProfileProps> = (
           <IonCardHeader>
             <IonCardTitle>Charge your account</IonCardTitle>
           </IonCardHeader>
-          <IonCardContent></IonCardContent>
+          <IonCardContent>
+            <IonGrid>
+              <IonRow>
+                {state.paymentPlans?.map(
+                  (paymentPlan: PaymentPlan, index: number) => {
+                    return (
+                      <IonCol key={index}>
+                        <IonCard
+                          button
+                          color={
+                            state.selectedPlan === index ? "primary" : undefined
+                          }
+                          onClick={() =>
+                            setState((draft) => {
+                              draft.selectedPlan = index;
+                              draft.payWithPaymentPlan = true;
+                            })
+                          }
+                        >
+                          <IonCardHeader>
+                            <IonCardTitle>
+                              Price: {paymentPlan.price}
+                            </IonCardTitle>
+                            <IonCardSubtitle>
+                              eBalance Worth: {paymentPlan.worth.total}
+                            </IonCardSubtitle>
+                          </IonCardHeader>
+                        </IonCard>
+                      </IonCol>
+                    );
+                  }
+                )}
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Free amount payment</IonCardTitle>
+                    </IonCardHeader>
+                  </IonCard>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonCardTitle>Summary</IonCardTitle>
+                    </IonCardHeader>
+                  </IonCard>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonCardContent>
           <IonCardContent>
             {respToken.token && (
               <div>
