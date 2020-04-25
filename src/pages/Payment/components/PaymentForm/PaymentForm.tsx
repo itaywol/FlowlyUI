@@ -1,32 +1,25 @@
 import {
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonSpinner,
   IonCard,
-  IonCardHeader,
   IonCardContent,
-  IonButton,
+  IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonGrid,
   IonCol,
+  IonGrid,
   IonRow,
+  IonInput,
+  IonLabel,
+  IonText,
 } from "@ionic/react";
-import { useImmer } from "use-immer";
-import React, { useEffect, useState } from "react";
-import "./Payment.scss";
-import { UserProviderState, withUser } from "../../providers/UserProvider";
-import assertNever from "assert-never";
-import { useBraintree } from "../../hooks/useBraintree";
-import DropIn from "braintree-web-drop-in-react";
-import Axios from "axios";
+import React, { useEffect } from "react";
+import {
+  WithPaymentProps,
+  PaymentPlan,
+} from "../../../../providers/PaymentProvider";
 
-const PaymentFormContent: React.FunctionComponent = () => {
+export const PaymentForm: React.FunctionComponent<WithPaymentProps> = ({
+  paymentProps: { state, dispatch },
+}: WithPaymentProps) => {
   return (
     <IonCardContent>
       <IonGrid>
@@ -37,12 +30,15 @@ const PaymentFormContent: React.FunctionComponent = () => {
                 <IonCol key={index}>
                   <IonCard
                     button
-                    color={state.selectedPlan === index ? "primary" : undefined}
+                    color={
+                      state?.selectedPaymentPlan?._id === paymentPlan._id &&
+                      state.checkoutUsingPaymentPlan
+                        ? "primary"
+                        : undefined
+                    }
                     onClick={() =>
-                      setState((draft) => {
-                        draft.selectedPlan = index;
-                        draft.payWithPaymentPlan = true;
-                      })
+                      dispatch &&
+                      dispatch({ type: "usePlan", plan: paymentPlan })
                     }
                   >
                     <IonCardHeader>
@@ -61,8 +57,28 @@ const PaymentFormContent: React.FunctionComponent = () => {
           <IonCol>
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Free amount payment</IonCardTitle>
+                <IonCardTitle>Free amount selection</IonCardTitle>
               </IonCardHeader>
+              <IonCardContent>
+                <IonLabel position="floating">Amount in NIS</IonLabel>
+                <IonInput
+                  type="number"
+                  inputmode="numeric"
+                  min={"0"}
+                  color={
+                    !state.checkoutUsingPaymentPlan ? "primary" : undefined
+                  }
+                  onIonChange={(e: CustomEvent<any>) => {
+                    dispatch &&
+                      e.detail.value != null &&
+                      dispatch({
+                        type: "useFreeAmount",
+                        amount: e.detail.value,
+                      });
+                  }}
+                ></IonInput>
+                <IonText>eBalance Worth:{state.specifyPaymentAmount}</IonText>
+              </IonCardContent>
             </IonCard>
           </IonCol>
         </IonRow>
@@ -71,6 +87,13 @@ const PaymentFormContent: React.FunctionComponent = () => {
             <IonCard>
               <IonCardHeader>
                 <IonCardTitle>Summary</IonCardTitle>
+                <IonCardContent>
+                  Total Payment:{" "}
+                  {state.checkoutUsingPaymentPlan
+                    ? state.selectedPaymentPlan?.price
+                    : state.specifyPaymentAmount}{" "}
+                  $
+                </IonCardContent>
               </IonCardHeader>
             </IonCard>
           </IonCol>
@@ -79,12 +102,3 @@ const PaymentFormContent: React.FunctionComponent = () => {
     </IonCardContent>
   );
 };
-
-export const PaymentForm: React.FunctionComponent = () => {
-  return (
-    <>
-      <PaymentFormContent />
-    </>
-  );
-};
-

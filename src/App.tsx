@@ -27,6 +27,7 @@ import { LoginPage } from "./pages/Login/Login";
 import { RegisterPage } from "./pages/Register/Register";
 import { ProfilePage } from "./pages/Profile/Profile";
 import { PaymentPage } from "./pages/Payment/Payment";
+import { PaymentProvider } from "./providers/PaymentProvider";
 
 const App: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("");
