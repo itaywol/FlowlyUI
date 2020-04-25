@@ -36,7 +36,7 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
     fetchToken,
     checkout,
     fetchPaymentPlans,
-  } = props.paymentProps;
+  } = props.payment;
   useEffect(() => {
     if (fetchToken && !state.paymentToken) fetchToken();
     if (!state.paymentPlans && fetchPaymentPlans) fetchPaymentPlans();

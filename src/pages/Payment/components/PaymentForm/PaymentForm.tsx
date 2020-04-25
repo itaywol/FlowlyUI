@@ -18,7 +18,7 @@ import {
 } from "../../../../providers/PaymentProvider";
 
 export const PaymentForm: React.FunctionComponent<WithPaymentProps> = ({
-  paymentProps: { state, dispatch },
+  payment: { state, dispatch },
 }: WithPaymentProps) => {
   return (
     <IonCardContent>

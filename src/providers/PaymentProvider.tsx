@@ -40,6 +40,8 @@ declare namespace PaymentProviderState {
     selectedPaymentPlan: PaymentPlan | null;
     specifyPaymentAmount: number;
     checkoutUsingPaymentPlan: boolean;
+    checkoutCalled: boolean;
+    checkoutSuccess: boolean;
   }
   interface Failed {
     type: "Failed";
@@ -53,6 +55,8 @@ export interface PaymentProviderState {
   selectedPaymentPlan: PaymentPlan | null;
   specifyPaymentAmount: number;
   checkoutUsingPaymentPlan: boolean;
+  checkoutCalled: boolean;
+  checkoutSuccess: boolean;
 }
 
 export type paymentReducerActions =
@@ -91,11 +95,15 @@ const paymentReducer: Reducer<PaymentProviderState, paymentReducerActions> = (
           Axios.post("/api/payment/checkout", {
             payment_method_nounce: action.nonce,
             paymentPlanID: draft?.selectedPaymentPlan?._id,
+          }).then((response: AxiosResponse<any>) => {
+            if (response.status < 300) draft.checkoutSuccess = true;
           });
         } else {
           Axios.post("/api/payment/checkout", {
             payment_method_nounce: action.nonce,
             paymentAmount: draft.specifyPaymentAmount,
+          }).then((response: AxiosResponse<any>) => {
+            if (response.status < 300) draft.checkoutSuccess = true;
           });
         }
       }
@@ -119,6 +127,8 @@ const PaymentProviderInitialState: PaymentProviderState = {
   checkoutUsingPaymentPlan: false,
   specifyPaymentAmount: 0,
   selectedPaymentPlan: null,
+  checkoutCalled: false,
+  checkoutSuccess: false,
 };
 
 export const PaymentContext = createContext<PaymentProviderProps>({
@@ -155,6 +165,7 @@ export const PaymentProvider: FC = ({ children }) => {
         dispatch({ type: "checkout", nonce: response.nonce });
       });
   };
+
   const fetchPaymentPlans = () => {
     Axios.get<PaymentPlan[] | null>("/api/payment/plan")
       .then((response: AxiosResponse<PaymentPlan[] | null>) => {
@@ -164,6 +175,7 @@ export const PaymentProvider: FC = ({ children }) => {
         throw error;
       });
   };
+
   return (
     <PaymentContext.Provider
       value={{
@@ -181,7 +193,7 @@ export const PaymentProvider: FC = ({ children }) => {
 };
 
 export interface WithPaymentProps {
-  paymentProps: PaymentProviderProps;
+  payment: PaymentProviderProps;
 }
 
 export function withPayment<T extends WithPaymentProps = WithPaymentProps>(
@@ -190,6 +202,6 @@ export function withPayment<T extends WithPaymentProps = WithPaymentProps>(
   return (props: Optionalize<T, WithPaymentProps>) => {
     const payment = useContext(PaymentContext);
 
-    return <WrappedComponent {...(props as T)} paymentProps={payment} />;
+    return <WrappedComponent {...(props as T)} payment={payment} />;
   };
 }
