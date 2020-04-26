@@ -9,18 +9,22 @@ interface User {
   lastName: string;
 }
 
+interface UserProviderStateCommons {
+  logout: () => Promise<AxiosResponse<void>>;
+  register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
+  login: (email: string, password: string) => Promise<User | null>;
+  refresh: () => Promise<User | null>;
+  facebookAuthURL: string;
+}
+
 declare namespace UserProviderState {
   interface Loading {
     type: "Loading";
   }
 
-  interface Ready {
+  interface Ready extends UserProviderStateCommons {
     type: "Ready";
     user: User | null;
-    logout: () => Promise<AxiosResponse<void>>;
-    register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
-    login: (email: string, password: string) => Promise<User | null>;
-    refresh: () => Promise<User | null>;
   }
 
   interface Failed {
@@ -85,7 +89,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: undefined
+        user: null
       });
       return data;
     });
@@ -137,12 +141,13 @@ export class UserProvider extends Component<{}, UserProviderState> {
     return result;
   };
 
-  getFunctions() {
+  getFunctions(): UserProviderStateCommons {
     return {
       login: this.login,
       logout: this.logout,
       refresh: this.refresh,
-      register: this.register
+      register: this.register,
+      facebookAuthURL: "/api/auth/facebook"
     };
   }
 

@@ -9,11 +9,13 @@ import {
   IonInput,
   IonButton,
   IonSpinner,
-  IonAlert
+  IonAlert,
+  IonIcon
 } from "@ionic/react";
 import React, { useState } from "react";
 import "./Login.css";
 import { UserProviderState, withUser } from "../../providers/UserProvider";
+import { logoFacebook } from "ionicons/icons";
 
 interface LoginProps {
   user: UserProviderState;
@@ -92,6 +94,10 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
               }
             />
             <IonButton type={"submit"}>{"Login"}</IonButton>
+            <IonButton href={props.user.facebookAuthURL}>
+              <IonIcon slot="start" icon={logoFacebook} />
+              Facebook
+            </IonButton>
           </form>
         ) : (
           <IonSpinner />
