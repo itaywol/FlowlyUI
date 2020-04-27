@@ -11,6 +11,7 @@ import Axios, { AxiosResponse } from "axios";
 import { Draft } from "immer";
 import { Optionalize } from "../utils/Optionalize";
 import { useImmerReducer, Reducer, useImmer } from "use-immer";
+import { UserContext } from "./UserProvider";
 
 export interface TokenResponse {
   clientToken: string;
@@ -136,6 +137,7 @@ export const PaymentContext = createContext<PaymentProviderProps>({
 });
 
 export const PaymentProvider: FC = ({ children }) => {
+  const user = useContext(UserContext);
   const [state, dispatch] = useImmerReducer(
     paymentReducer,
     PaymentProviderInitialState
@@ -148,6 +150,10 @@ export const PaymentProvider: FC = ({ children }) => {
       dispatch({ type: "checkoutDone", success: data.success, data: data });
     });
   }, []);
+
+  useEffect(() => {
+    if (user.type === "Ready") user.refresh();
+  }, [state.checkoutSuccess]);
 
   const fetchToken = () => {
     Axios.post<TokenResponse | null>("/api/payment/token").then(
