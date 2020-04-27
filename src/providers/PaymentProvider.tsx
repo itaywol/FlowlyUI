@@ -141,11 +141,11 @@ export const PaymentProvider: FC = ({ children }) => {
     PaymentProviderInitialState
   );
   const [bInstance, setBInstance] = useState<any>(null);
+  const socket = socketIoClient("/payment", { path: "/ws" });
 
   useEffect(() => {
-    const socket = socketIoClient("/payment", { path: "/ws" });
     socket.on("PaymentStatus", (data: any) => {
-      dispatch({ type: "checkoutDone", success: true, data: data });
+      dispatch({ type: "checkoutDone", success: data.success, data: data });
     });
   }, []);
 
@@ -169,18 +169,16 @@ export const PaymentProvider: FC = ({ children }) => {
           Axios.post("/api/payment/checkout", {
             payment_method_nounce: response.nonce,
             paymentPlanID: state?.selectedPaymentPlan?._id,
-          }).then((response: AxiosResponse<any>) => {
-            if (response.status < 300)
-              dispatch({ type: "checkoutDone", success: true });
+          }).then(() => {
+            dispatch({ type: "checkoutDone", success: false });
           });
         } else {
           dispatch({ type: "checkout", loading: true });
           Axios.post("/api/payment/checkout", {
             payment_method_nounce: response.nonce,
             paymentAmount: state.specifyPaymentAmount,
-          }).then((response: AxiosResponse<any>) => {
-            if (response.status < 300)
-              dispatch({ type: "checkoutDone", success: true });
+          }).then(() => {
+            dispatch({ type: "checkoutDone", success: false });
           });
         }
       });

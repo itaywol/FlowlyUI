@@ -53,9 +53,16 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
         {state.checkoutCalled && state.checkoutLoading && <IonSpinner />}
         {state.checkoutSuccess && (
           <IonCardHeader>
-            <IonCardTitle>Great Success</IonCardTitle>
+            <IonCardTitle>Transaction Success</IonCardTitle>
           </IonCardHeader>
         )}
+        {state.checkoutCalled &&
+          !state.checkoutLoading &&
+          !state.checkoutSuccess && (
+            <IonCardHeader>
+              <IonCardTitle>Trasnaction Failed</IonCardTitle>
+            </IonCardHeader>
+          )}
         {!state.checkoutCalled && !state.checkoutLoading && (
           <>
             <IonCardHeader>
