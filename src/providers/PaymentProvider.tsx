@@ -143,9 +143,9 @@ export const PaymentProvider: FC = ({ children }) => {
     PaymentProviderInitialState
   );
   const [bInstance, setBInstance] = useState<any>(null);
-  const socket = socketIoClient("/payment", { path: "/ws" });
 
   useEffect(() => {
+    const socket = socketIoClient("/payment", { path: "/ws" });
     socket.on("PaymentStatus", (data: any) => {
       dispatch({ type: "checkoutDone", success: data.success, data: data });
     });

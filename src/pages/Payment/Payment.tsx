@@ -42,11 +42,6 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
     if (!state.paymentPlans && fetchPaymentPlans) fetchPaymentPlans();
   }, [state]);
 
-  console.log(
-    state.checkoutUsingPaymentPlan
-      ? state.selectedPaymentPlan?.price
-      : state.specifyPaymentAmount
-  );
   return (
     <>
       <IonCard>
@@ -71,11 +66,9 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
             <PaymentForm {...props} />
             <IonCardContent>
               {state.paymentToken?.clientToken &&
-                setInstance &&
-                state.paymentPlans &&
-                (state.specifyPaymentAmount ||
-                  state.selectedPaymentPlan?.price) && (
-                  <div>
+                (state?.specifyPaymentAmount ||
+                  state?.selectedPaymentPlan?.price) && (
+                  <>
                     <DropIn
                       options={{
                         authorization: state?.paymentToken?.clientToken,
@@ -90,7 +83,7 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
                         },
                       }}
                       onInstance={(instance: any) => {
-                        setInstance(instance);
+                        if (setInstance) setInstance(instance);
                       }}
                     ></DropIn>
                     <IonButton
@@ -102,7 +95,7 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
                     >
                       Submit Payment
                     </IonButton>
-                  </div>
+                  </>
                 )}
             </IonCardContent>
           </>

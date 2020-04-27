@@ -38,7 +38,9 @@ const ProfilePageContent: React.FunctionComponent<ProfileProps> = (
           </IonCardSubtitle>
         </IonCardHeader>
         <IonCardContent>
-          <IonButton href="/payment">Payment</IonButton>
+          <IonButton routerLink={"payment"} routerDirection="forward">
+            Payment
+          </IonButton>
         </IonCardContent>
       </IonCard>
     )
