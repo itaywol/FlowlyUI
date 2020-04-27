@@ -50,46 +50,56 @@ const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
   return (
     <>
       <IonCard>
-        <IonCardHeader>
-          <IonCardTitle>Charge your account</IonCardTitle>
-        </IonCardHeader>
-        <PaymentForm {...props} />
-        <IonCardContent>
-          {state.paymentToken?.clientToken &&
-            setInstance &&
-            state.paymentPlans &&
-            (state.specifyPaymentAmount ||
-              state.selectedPaymentPlan?.price) && (
-              <div>
-                <DropIn
-                  options={{
-                    authorization: state?.paymentToken?.clientToken,
-                    paymentOptionPriority: ["paypal", "card"],
-                    paypal: {
-                      intent: "authorize",
-                      flow: "checkout",
-                      amount: state.checkoutUsingPaymentPlan
-                        ? state.selectedPaymentPlan?.price
-                        : state.specifyPaymentAmount,
-                      currency: "USD",
-                    },
-                  }}
-                  onInstance={(instance: any) => {
-                    setInstance(instance);
-                  }}
-                ></DropIn>
-                <IonButton
-                  fill="solid"
-                  style={{ width: "100%" }}
-                  onClick={() => {
-                    if (checkout !== null) checkout();
-                  }}
-                >
-                  Submit Payment
-                </IonButton>
-              </div>
-            )}
-        </IonCardContent>
+        {state.checkoutCalled && state.checkoutLoading && <IonSpinner />}
+        {state.checkoutSuccess && (
+          <IonCardHeader>
+            <IonCardTitle>Great Success</IonCardTitle>
+          </IonCardHeader>
+        )}
+        {!state.checkoutCalled && !state.checkoutLoading && (
+          <>
+            <IonCardHeader>
+              <IonCardTitle>Charge your account</IonCardTitle>
+            </IonCardHeader>
+            <PaymentForm {...props} />
+            <IonCardContent>
+              {state.paymentToken?.clientToken &&
+                setInstance &&
+                state.paymentPlans &&
+                (state.specifyPaymentAmount ||
+                  state.selectedPaymentPlan?.price) && (
+                  <div>
+                    <DropIn
+                      options={{
+                        authorization: state?.paymentToken?.clientToken,
+                        paymentOptionPriority: ["paypal", "card"],
+                        paypal: {
+                          intent: "authorize",
+                          flow: "checkout",
+                          amount: state.checkoutUsingPaymentPlan
+                            ? state.selectedPaymentPlan?.price
+                            : state.specifyPaymentAmount,
+                          currency: "USD",
+                        },
+                      }}
+                      onInstance={(instance: any) => {
+                        setInstance(instance);
+                      }}
+                    ></DropIn>
+                    <IonButton
+                      fill="solid"
+                      style={{ width: "100%" }}
+                      onClick={() => {
+                        if (checkout !== null) checkout();
+                      }}
+                    >
+                      Submit Payment
+                    </IonButton>
+                  </div>
+                )}
+            </IonCardContent>
+          </>
+        )}
       </IonCard>
     </>
   );

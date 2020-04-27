@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import socketIoClient from "socket.io-client";
 import Axios, { AxiosResponse } from "axios";
 import { Draft } from "immer";
 import { Optionalize } from "../utils/Optionalize";
@@ -56,13 +57,15 @@ export interface PaymentProviderState {
   specifyPaymentAmount: number;
   checkoutUsingPaymentPlan: boolean;
   checkoutCalled: boolean;
+  checkoutLoading: boolean;
   checkoutSuccess: boolean;
 }
 
 export type paymentReducerActions =
   | { type: "getToken"; tokenResponse: TokenResponse | null }
   | { type: "getPaymentPlans"; plans: PaymentPlan[] | null }
-  | { type: "checkout"; nonce: string }
+  | { type: "checkout"; loading: boolean }
+  | { type: "checkoutDone"; success: boolean; data?: any }
   | { type: "useFreeAmount"; amount: number }
   | { type: "usePlan"; plan: PaymentPlan };
 
@@ -90,24 +93,15 @@ const paymentReducer: Reducer<PaymentProviderState, paymentReducerActions> = (
       break;
     }
     case "checkout": {
-      if (action.nonce) {
-        if (draft.checkoutUsingPaymentPlan) {
-          Axios.post("/api/payment/checkout", {
-            payment_method_nounce: action.nonce,
-            paymentPlanID: draft?.selectedPaymentPlan?._id,
-          }).then((response: AxiosResponse<any>) => {
-            if (response.status < 300) draft.checkoutSuccess = true;
-          });
-        } else {
-          Axios.post("/api/payment/checkout", {
-            payment_method_nounce: action.nonce,
-            paymentAmount: draft.specifyPaymentAmount,
-          }).then((response: AxiosResponse<any>) => {
-            if (response.status < 300) draft.checkoutSuccess = true;
-          });
-        }
+      draft.checkoutCalled = true;
+      draft.checkoutLoading = action.loading;
+      break;
+    }
+    case "checkoutDone": {
+      if (action.data) {
+        draft.checkoutLoading = false;
+        draft.checkoutSuccess = action.success;
       }
-
       break;
     }
   }
@@ -128,6 +122,7 @@ const PaymentProviderInitialState: PaymentProviderState = {
   specifyPaymentAmount: 0,
   selectedPaymentPlan: null,
   checkoutCalled: false,
+  checkoutLoading: false,
   checkoutSuccess: false,
 };
 
@@ -147,6 +142,13 @@ export const PaymentProvider: FC = ({ children }) => {
   );
   const [bInstance, setBInstance] = useState<any>(null);
 
+  useEffect(() => {
+    const socket = socketIoClient("/payment", { path: "/ws" });
+    socket.on("PaymentStatus", (data: any) => {
+      dispatch({ type: "checkoutDone", success: true, data: data });
+    });
+  }, []);
+
   const fetchToken = () => {
     Axios.post<TokenResponse | null>("/api/payment/token").then(
       (response: AxiosResponse<TokenResponse | null>) => {
@@ -160,10 +162,29 @@ export const PaymentProvider: FC = ({ children }) => {
   };
 
   const checkout = () => {
-    if (bInstance !== null)
+    if (bInstance !== null) {
       bInstance.requestPaymentMethod().then((response: any) => {
-        dispatch({ type: "checkout", nonce: response.nonce });
+        if (state.checkoutUsingPaymentPlan) {
+          dispatch({ type: "checkout", loading: true });
+          Axios.post("/api/payment/checkout", {
+            payment_method_nounce: response.nonce,
+            paymentPlanID: state?.selectedPaymentPlan?._id,
+          }).then((response: AxiosResponse<any>) => {
+            if (response.status < 300)
+              dispatch({ type: "checkoutDone", success: true });
+          });
+        } else {
+          dispatch({ type: "checkout", loading: true });
+          Axios.post("/api/payment/checkout", {
+            payment_method_nounce: response.nonce,
+            paymentAmount: state.specifyPaymentAmount,
+          }).then((response: AxiosResponse<any>) => {
+            if (response.status < 300)
+              dispatch({ type: "checkoutDone", success: true });
+          });
+        }
       });
+    }
   };
 
   const fetchPaymentPlans = () => {
