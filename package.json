@@ -21,9 +21,9 @@
     "@videojs/http-streaming": "1.13.2",
     "assert-never": "1.2.0",
     "axios": "0.19.2",
-    "braintree-dropin-react": "^0.1.1",
-    "braintree-web": "^3.60.0",
-    "braintree-web-drop-in-react": "^1.1.1",
+    "braintree-dropin-react": "0.1.1",
+    "braintree-web": "3.60.0",
+    "braintree-web-drop-in-react": "1.1.1",
     "immer": "^6.0.3",
     "ionicons": "5.0.0",
     "node-sass": "4.13.1",
@@ -32,11 +32,12 @@
     "react-router": "5.1.2",
     "react-router-dom": "5.1.2",
     "react-scripts": "3.4.0",
-    "socket.io-client": "^2.3.0",
+    "socket.io-client": "2.3.0",
     "typescript": "3.7.4",
     "use-immer": "^0.4.0",
     "video.js": "7.7.5",
-    "videojs-contrib-dash": "2.11.0"
+    "videojs-contrib-dash": "2.11.0",
+    "react-facebook-login": "4.1.1"
   },
   "scripts": {
     "start": "PORT=5858 PUBLIC_URL=/ react-scripts start",
@@ -61,8 +62,9 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.0.0",
-    "@types/braintree-web": "^3.47.2",
-    "@types/socket.io-client": "^1.4.32",
+    "@types/react-facebook-login": "4.1.1",
+    "@types/braintree-web": "3.47.2",
+    "@types/socket.io-client": "1.4.32",
     "@types/video.js": "7.3.7"
   },
   "description": "An Ionic project"

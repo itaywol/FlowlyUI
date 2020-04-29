@@ -17,18 +17,22 @@ interface User {
   balance: Balance;
 }
 
+interface UserProviderStateCommons {
+  logout: () => Promise<AxiosResponse<void>>;
+  register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
+  login: (email: string, password: string) => Promise<User | null>;
+  refresh: () => Promise<User | null>;
+  facebookLogin: (token: string) => Promise<User | null>;
+}
+
 declare namespace UserProviderState {
   interface Loading {
     type: "Loading";
   }
 
-  interface Ready {
+  interface Ready extends UserProviderStateCommons {
     type: "Ready";
     user: User | null;
-    logout: () => Promise<AxiosResponse<void>>;
-    register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
-    login: (email: string, password: string) => Promise<User | null>;
-    refresh: () => Promise<User | null>;
   }
 
   interface Failed {
@@ -93,7 +97,7 @@ export class UserProvider extends Component<{}, UserProviderState> {
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: undefined,
+        user: null
       });
       return data;
     });
@@ -146,12 +150,46 @@ export class UserProvider extends Component<{}, UserProviderState> {
     return result;
   };
 
-  getFunctions() {
+  facebookLogin = async (token: string) => {
+    this.setState({ type: "Loading" });
+
+    let result = null;
+
+    try {
+      const data = (await Axios.get<User>("/api/auth/facebook?access_token=" + token)).data;
+
+      this.setState({
+        type: "Ready",
+        ...this.getFunctions(),
+        user: data
+      });
+
+      result = data;
+    } catch (e) {
+      switch (e.response.status) {
+        case 401:
+          this.setState({
+            type: "Ready",
+            ...this.getFunctions(),
+            user: null
+          });
+          break;
+        default:
+          this.setState({ type: "Failed" });
+          throw e;
+      }
+    }
+
+    return result;
+  };
+
+  getFunctions(): UserProviderStateCommons {
     return {
       login: this.login,
       logout: this.logout,
       refresh: this.refresh,
       register: this.register,
+      facebookLogin: this.facebookLogin
     };
   }
 
