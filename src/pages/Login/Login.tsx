@@ -10,12 +10,12 @@ import {
   IonButton,
   IonSpinner,
   IonAlert,
-  IonIcon
+  IonIcon,
 } from "@ionic/react";
+import FacebookLogin from "react-facebook-login";
 import React, { useState } from "react";
 import "./Login.css";
 import { UserProviderState, withUser } from "../../providers/UserProvider";
-import { logoFacebook } from "ionicons/icons";
 
 interface LoginProps {
   user: UserProviderState;
@@ -42,7 +42,7 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
       if (result === null) {
         setShowAlert("Error logging in. Try again.");
       } else {
-        setState(prevState => {
+        setState((prevState) => {
           prevState.redirect = "/home";
           return prevState;
         });
@@ -75,8 +75,8 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
               placeholder="Email"
               type={"email"}
               value={state.email}
-              onIonInput={e =>
-                setState(prevState => {
+              onIonInput={(e) =>
+                setState((prevState) => {
                   prevState.email = (e.target as HTMLInputElement).value;
                   return prevState;
                 })
@@ -86,18 +86,24 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
               placeholder="Password"
               type={"password"}
               value={state.password}
-              onIonInput={e =>
-                setState(prevState => {
+              onIonInput={(e) =>
+                setState((prevState) => {
                   prevState.password = (e.target as HTMLInputElement).value;
                   return prevState;
                 })
               }
             />
             <IonButton type={"submit"}>{"Login"}</IonButton>
-            <IonButton href={props.user.facebookAuthURL}>
-              <IonIcon slot="start" icon={logoFacebook} />
-              Facebook
-            </IonButton>
+            <FacebookLogin
+              appId="662636214298507"
+              autoLoad={true}
+              fields="name,email,picture"
+              callback={(result) =>
+                props.user.type === "Ready"
+                  ? props.user.facebookLogin(result.accessToken)
+                  : null
+              }
+            />
           </form>
         ) : (
           <IonSpinner />

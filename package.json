@@ -32,7 +32,8 @@
     "typescript": "3.7.4",
     "use-immer": "^0.4.0",
     "video.js": "7.7.5",
-    "videojs-contrib-dash": "2.11.0"
+    "videojs-contrib-dash": "2.11.0",
+    "react-facebook-login": "4.1.1"
   },
   "scripts": {
     "start": "PORT=5858 PUBLIC_URL=/ react-scripts start",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.0.0",
+    "@types/react-facebook-login": "^4.1.1",
     "@types/video.js": "7.3.7"
   },
   "description": "An Ionic project"

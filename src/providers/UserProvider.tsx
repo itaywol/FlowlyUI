@@ -14,7 +14,7 @@ interface UserProviderStateCommons {
   register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
   login: (email: string, password: string) => Promise<User | null>;
   refresh: () => Promise<User | null>;
-  facebookAuthURL: string;
+  facebookLogin: (token: string) => Promise<User | null>;
 }
 
 declare namespace UserProviderState {
@@ -141,13 +141,46 @@ export class UserProvider extends Component<{}, UserProviderState> {
     return result;
   };
 
+  facebookLogin = async (token: string) => {
+    this.setState({ type: "Loading" });
+
+    let result = null;
+
+    try {
+      const data = (await Axios.get<User>("/api/auth/facebook?access_token=" + token)).data;
+
+      this.setState({
+        type: "Ready",
+        ...this.getFunctions(),
+        user: data
+      });
+
+      result = data;
+    } catch (e) {
+      switch (e.response.status) {
+        case 401:
+          this.setState({
+            type: "Ready",
+            ...this.getFunctions(),
+            user: null
+          });
+          break;
+        default:
+          this.setState({ type: "Failed" });
+          throw e;
+      }
+    }
+
+    return result;
+  };
+
   getFunctions(): UserProviderStateCommons {
     return {
       login: this.login,
       logout: this.logout,
       refresh: this.refresh,
       register: this.register,
-      facebookAuthURL: "/api/auth/facebook"
+      facebookLogin: this.facebookLogin
     };
   }
 
