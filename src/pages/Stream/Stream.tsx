@@ -9,18 +9,18 @@ import {
   IonSpinner,
   IonButton,
 } from "@ionic/react";
-import React from "react";
+import React, { FC } from "react";
 import { withUser, WithUserProps } from "../../providers/UserProvider";
 import { withRouter, RouterProps, Redirect } from "react-router";
 import {
   withUserChannel,
-  withChannelProps,
-  ChannelProvider,
+  UserChannelProvider,
+  withUserChannelProps,
 } from "../../providers/UserChannel";
 
 export const StreamPageComponenet: React.FunctionComponent<
-  RouterProps & WithUserProps & withChannelProps
-> = ({ user, sendMessage }) => {
+  RouterProps & WithUserProps & withUserChannelProps
+> = ({ user, channel }) => {
   if (user.type === "Loading") return <IonSpinner />;
   if (user.type === "Failed") return <Redirect to="/login" />;
   if (user.type === "Ready") {
@@ -43,7 +43,16 @@ export const StreamPageComponenet: React.FunctionComponent<
           <IonContent>
             <IonButton
               onClick={() => {
-                if (sendMessage) sendMessage("hello");
+                if (
+                  channel.state === "Ready" &&
+                  channel.sendMessage &&
+                  channel?.channel?.owner?.nickName
+                ) {
+                  channel.sendMessage(
+                    "hello",
+                    channel?.channel?.owner?.nickName
+                  );
+                }
               }}
             >
               Send message
@@ -53,10 +62,17 @@ export const StreamPageComponenet: React.FunctionComponent<
       </IonPage>
     );
   }
-
   return <></>;
 };
 
-export const StreamPage = withRouter(
+export const WrappedStreamPage = withRouter(
   withUser(withUserChannel(StreamPageComponenet))
 );
+
+export const StreamPage: FC = () => {
+  return (
+    <UserChannelProvider>
+      <WrappedStreamPage />
+    </UserChannelProvider>
+  );
+};

@@ -27,9 +27,7 @@ import { LoginPage } from "./pages/Login/Login";
 import { RegisterPage } from "./pages/Register/Register";
 import { ProfilePage } from "./pages/Profile/Profile";
 import { PaymentPage } from "./pages/Payment/Payment";
-import { PaymentProvider } from "./providers/PaymentProvider";
 import { StreamPage } from "./pages/Stream/Stream";
-import { ChannelProvider } from "./providers/UserChannel";
 
 const App: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -77,11 +75,7 @@ const App: React.FC = () => {
                 path="/channel/:nickName"
                 render={() => {
                   setSelectedPage("channel");
-                  return (
-                    <ChannelProvider>
-                      <StreamPage />
-                    </ChannelProvider>
-                  );
+                  return <StreamPage />;
                 }}
                 exact={false}
               />
