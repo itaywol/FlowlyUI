@@ -7,7 +7,7 @@ interface Balance {
   currentBalance: number;
 }
 
-interface User {
+export interface User {
   email: string;
   nickName: string;
   id: string;
