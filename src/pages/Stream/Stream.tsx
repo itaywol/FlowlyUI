@@ -17,6 +17,7 @@ import {
   UserChannelProvider,
   withUserChannelProps,
 } from "../../providers/UserChannel";
+import { Chat } from "./components/Chat";
 
 export const StreamPageComponenet: React.FunctionComponent<
   RouterProps & WithUserProps & withUserChannelProps
@@ -32,7 +33,7 @@ export const StreamPageComponenet: React.FunctionComponent<
             <IonButtons slot="start">
               <IonMenuButton />
             </IonButtons>
-            <IonTitle>Channel</IonTitle>
+            <IonTitle>{channel.channel?.owner.nickName} Channel</IonTitle>
           </IonToolbar>
         </IonHeader>
 
@@ -41,22 +42,7 @@ export const StreamPageComponenet: React.FunctionComponent<
             <IonToolbar slot="start"></IonToolbar>
           </IonHeader>
           <IonContent>
-            <IonButton
-              onClick={() => {
-                if (
-                  channel.state === "Ready" &&
-                  channel.sendMessage &&
-                  channel?.channel?.owner?.nickName
-                ) {
-                  channel.sendMessage(
-                    "hello",
-                    channel?.channel?.owner?.nickName
-                  );
-                }
-              }}
-            >
-              Send message
-            </IonButton>
+            <Chat />
           </IonContent>
         </IonContent>
       </IonPage>

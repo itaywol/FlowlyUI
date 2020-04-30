@@ -1,30 +1,55 @@
+import React from "react";
 import {
-  IonButtons,
+  withUserChannel,
+  withUserChannelProps,
+  ChatMessage,
+} from "../../../providers/UserChannel";
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonLabel,
+  IonItem,
   IonContent,
   IonHeader,
-  IonMenuButton,
-  IonPage,
   IonTitle,
-  IonToolbar,
 } from "@ionic/react";
-import React from "react";
-import { withUser } from "../../../providers/UserProvider";
 
-export const ChatCompoenent: React.FunctionComponent = () => {
+export const ChatCompoenent: React.FunctionComponent<withUserChannelProps> = ({
+  channel,
+}) => {
   return (
-    <IonPage>
+    <IonContent>
       <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
-          <IonTitle>Chat</IonTitle>
-        </IonToolbar>
+        <IonTitle>{channel.channel?.owner.nickName} Chat</IonTitle>
       </IonHeader>
-
-      <IonContent fullscreen class="ion-padding"></IonContent>
-    </IonPage>
+      <IonContent style={{ height: "500px" }}>
+        {channel?.channel?.chat.chatMessages.map((chatEntry: ChatMessage) => {
+          return (
+            <IonItem>
+              {chatEntry.sender.nickName} - {chatEntry.message}
+            </IonItem>
+          );
+        })}
+      </IonContent>
+      <IonContent>
+        <IonButton
+          onClick={() => {
+            if (
+              channel.sendMessage &&
+              channel.state === "Ready" &&
+              channel.channel?.owner.nickName
+            )
+              channel?.sendMessage("hey", channel?.channel?.owner?.nickName);
+          }}
+        >
+          Send Message
+        </IonButton>
+      </IonContent>
+    </IonContent>
   );
 };
 
-export const Chat = withUser(ChatCompoenent);
+export const Chat = withUserChannel(ChatCompoenent);

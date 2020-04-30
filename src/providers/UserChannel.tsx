@@ -13,9 +13,10 @@ import { Optionalize } from "../utils/Optionalize";
 import Axios, { AxiosResponse } from "axios";
 
 export interface ChatMessage {
-  sender: string;
+  sender: { user: string; nickName: String };
   message: string;
-  createdAt: string;
+  createdAt: number;
+  _id: string;
 }
 
 export interface ChatSettings {
@@ -35,7 +36,7 @@ export interface Channel {
 
 export interface UserChannel {
   state: "Init" | "Loading" | "Ready" | "Failed";
-  channel: Channel | null;
+  channel: Channel | undefined;
   getChannelData: (() => void) | null;
   sendMessage: ((message: string, room: string) => void) | null;
   joinChatRoom: (() => void) | null;
@@ -51,8 +52,6 @@ export type UserChannelActionsReducer =
   | {
       type: "joinedChannelChat";
       success: boolean;
-      chatSettings: ChatSettings;
-      chatMessages: ChatMessage[];
     }
   | {
       type: "assignMethods";
@@ -85,9 +84,8 @@ export const UserChannelStateReducer: Reducer<
     case "Loading": {
       switch (action.type) {
         case "setChannelData": {
-          draft.channel = action.data;
           draft.state = "Ready";
-          break;
+          draft.channel = action.data;
         }
       }
       break;
@@ -97,13 +95,11 @@ export const UserChannelStateReducer: Reducer<
         case "joinedChannelChat": {
           if (draft.channel) {
             draft.channel.chat.connected = action.success;
-            draft.channel.chat.chatMessages = action.chatMessages;
-            draft.channel.chat.chatSettings = action.chatSettings;
           }
           break;
         }
         case "addMessageToChat": {
-          if (draft.channel && draft.channel?.chat?.chatMessages?.length >= 0) {
+          if (draft.channel && draft.channel?.chat?.chatMessages) {
             draft.channel.chat.chatMessages.push(action.message);
             break;
           }
@@ -129,7 +125,7 @@ export const UserChannelStateReducer: Reducer<
 
 export const UserChannelInitialState: UserChannel = {
   state: "Init",
-  channel: null,
+  channel: undefined,
   getChannelData: null,
   sendMessage: null,
   joinChatRoom: null,
@@ -158,7 +154,7 @@ export const UserChannelProvider: FC = ({ children }) => {
       Axios.get("/api/user/channel", {
         params: { nickName: channelNickName },
       }).then((response: AxiosResponse<Channel>) => {
-        dispatch({ type: "setChannelData", data: response.data });
+        dispatch({ type: "setChannelData", data: response.data as Channel });
       });
   };
 
@@ -174,8 +170,6 @@ export const UserChannelProvider: FC = ({ children }) => {
           dispatch({
             type: "joinedChannelChat",
             success: true,
-            chatMessages: data.chatMessages,
-            chatSettings: data.chatSettings,
           });
       });
     }

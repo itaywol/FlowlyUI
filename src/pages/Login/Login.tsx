@@ -57,7 +57,7 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>{"Login"}</IonTitle>
+          <IonTitle>Login</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -96,7 +96,7 @@ const LoginPageComponent: React.FunctionComponent<LoginProps> = (
             <IonButton type={"submit"}>{"Login"}</IonButton>
             <FacebookLogin
               appId="662636214298507"
-              autoLoad={true}
+              autoLoad={false}
               fields="name,email,picture"
               callback={(result) =>
                 props.user.type === "Ready"
