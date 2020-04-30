@@ -11,13 +11,9 @@ import {
   IonCardHeader,
   IonCardContent,
   IonButton,
-  IonCardSubtitle,
   IonCardTitle,
-  IonGrid,
-  IonCol,
-  IonRow,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./Payment.scss";
 import DropIn from "braintree-web-drop-in-react";
 import {

@@ -28,6 +28,7 @@ import { RegisterPage } from "./pages/Register/Register";
 import { ProfilePage } from "./pages/Profile/Profile";
 import { PaymentPage } from "./pages/Payment/Payment";
 import { StreamPage } from "./pages/Stream/Stream";
+import { HomePage } from "./pages/Home/Home";
 
 const App: React.FC = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -39,6 +40,14 @@ const App: React.FC = () => {
           <IonSplitPane contentId="main">
             <Menu selectedPage={selectedPage} />
             <IonRouterOutlet id="main">
+            <Route
+                path="/home"
+                render={() => {
+                  setSelectedPage("home");
+                  return <HomePage />;
+                }}
+                exact={true}
+              />
               <Route
                 path="/login"
                 render={() => {

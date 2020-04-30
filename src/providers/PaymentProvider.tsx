@@ -1,6 +1,5 @@
 import React, {
   createContext,
-  Component,
   useContext,
   FC,
   useState,
@@ -10,7 +9,7 @@ import socketIoClient from "socket.io-client";
 import Axios, { AxiosResponse } from "axios";
 import { Draft } from "immer";
 import { Optionalize } from "../utils/Optionalize";
-import { useImmerReducer, Reducer, useImmer } from "use-immer";
+import { useImmerReducer, Reducer } from "use-immer";
 import { UserContext } from "./UserProvider";
 
 export interface TokenResponse {

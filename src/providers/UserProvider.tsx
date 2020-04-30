@@ -23,6 +23,7 @@ interface UserProviderStateCommons {
   login: (email: string, password: string) => Promise<User | null>;
   refresh: () => Promise<User | null>;
   facebookLogin: (token: string) => Promise<User | null>;
+  googleLogin: (token: string) => Promise<User | null>;
 }
 
 declare namespace UserProviderState {
@@ -183,13 +184,47 @@ export class UserProvider extends Component<{}, UserProviderState> {
     return result;
   };
 
+  googleLogin = async (token: string) => {
+    this.setState({ type: "Loading" });
+
+    let result = null;
+
+    try {
+      const data = (await Axios.get<User>("/api/auth/google?access_token=" + token)).data;
+
+      this.setState({
+        type: "Ready",
+        ...this.getFunctions(),
+        user: data
+      });
+
+      result = data;
+    } catch (e) {
+      switch (e.response.status) {
+        case 401:
+          this.setState({
+            type: "Ready",
+            ...this.getFunctions(),
+            user: null
+          });
+          break;
+        default:
+          this.setState({ type: "Failed" });
+          throw e;
+      }
+    }
+
+    return result;
+  };
+
   getFunctions(): UserProviderStateCommons {
     return {
       login: this.login,
       logout: this.logout,
       refresh: this.refresh,
       register: this.register,
-      facebookLogin: this.facebookLogin
+      facebookLogin: this.facebookLogin,
+      googleLogin: this.googleLogin
     };
   }
 
