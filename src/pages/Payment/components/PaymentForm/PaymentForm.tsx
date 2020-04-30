@@ -11,7 +11,7 @@ import {
   IonLabel,
   IonText,
 } from "@ionic/react";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   WithPaymentProps,
   PaymentPlan,
