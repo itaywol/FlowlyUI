@@ -12,6 +12,7 @@ import {
   IonText,
 } from "@ionic/react";
 import React from "react";
+import { PaymentPlans } from "../PaymentPlans/PaymentPlans";
 import {
   WithPaymentProps,
   PaymentPlan,
@@ -23,35 +24,13 @@ export const PaymentForm: React.FunctionComponent<WithPaymentProps> = ({
   return (
     <IonCardContent>
       <IonGrid>
+        <IonCard>
+          <IonCardHeader>
+            <IonCardTitle>Select one of our payment plans</IonCardTitle>
+          </IonCardHeader>
+        </IonCard>
         <IonRow>
-          {state.paymentPlans?.map(
-            (paymentPlan: PaymentPlan, index: number) => {
-              return (
-                <IonCol key={index}>
-                  <IonCard
-                    button
-                    color={
-                      state?.selectedPaymentPlan?._id === paymentPlan._id &&
-                      state.checkoutUsingPaymentPlan
-                        ? "primary"
-                        : undefined
-                    }
-                    onClick={() =>
-                      dispatch &&
-                      dispatch({ type: "usePlan", plan: paymentPlan })
-                    }
-                  >
-                    <IonCardHeader>
-                      <IonCardTitle>Price: {paymentPlan.price}</IonCardTitle>
-                      <IonCardSubtitle>
-                        eBalance Worth: {paymentPlan.worth.total}
-                      </IonCardSubtitle>
-                    </IonCardHeader>
-                  </IonCard>
-                </IonCol>
-              );
-            }
-          )}
+          <PaymentPlans />
         </IonRow>
         <IonRow>
           <IonCol>
