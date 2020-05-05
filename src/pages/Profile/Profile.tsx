@@ -18,6 +18,7 @@ import React from "react";
 import "./Profile.scss";
 import { UserProviderState, withUser } from "../../providers/UserProvider";
 import assertNever from "assert-never";
+import { Balance } from "../../components/Balance";
 
 interface ProfileProps {
   user: UserProviderState;
@@ -34,7 +35,7 @@ const ProfilePageContent: React.FunctionComponent<ProfileProps> = (
         <IonCardHeader>
           <IonCardTitle>Hello {props.user.user?.nickName}</IonCardTitle>
           <IonCardSubtitle>
-            eBalance: {props.user.user?.balance.currentBalance}
+            <Balance fontSize={15}/>
           </IonCardSubtitle>
         </IonCardHeader>
         <IonCardContent>

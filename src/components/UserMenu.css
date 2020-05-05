@@ -4,3 +4,37 @@
     align-items: center;
     padding: 6px;
 }
+
+.UserMenu__TitleContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.UserMenu__nickrow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    width: 100%;
+    font-size: 15px;
+}
+
+.UserMenu__loginlogout {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.UserMenu__balance {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.UserMenu__loginlogout > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

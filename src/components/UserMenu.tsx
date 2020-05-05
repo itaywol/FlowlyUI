@@ -11,6 +11,10 @@ import "./Menu.css";
 import { UserProviderState, withUser } from "../providers/UserProvider";
 import { assertNever } from "assert-never";
 import "./UserMenu.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoins } from "@fortawesome/free-solid-svg-icons";
+import { Balance } from "./Balance";
+import { menuController } from "@ionic/core";
 
 interface UserMenuProps {
     selectedPage: string;
@@ -40,6 +44,7 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
                                         ? "selected"
                                         : ""
                                 }
+                                onClick={() => menuController.close()}
                                 routerLink={"login"}
                                 routerDirection="none"
                                 lines="none"
@@ -54,6 +59,7 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
                                         ? "selected"
                                         : ""
                                 }
+                                onClick={() => menuController.close()}
                                 routerLink={"register"}
                                 routerDirection="none"
                                 lines="none"
@@ -68,7 +74,7 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
                     return (
                         <>
                             <IonItem
-                                onClick={() => userReady.logout()}
+                                onClick={() =>{userReady.logout(); menuController.close();}}
                                 routerDirection="none"
                                 lines="none"
                                 detail={false}
@@ -83,6 +89,7 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
                                         ? "selected"
                                         : ""
                                 }
+                                onClick={() => menuController.close()}
                                 routerLink={"profile"}
                                 routerDirection="none"
                                 lines="none"
@@ -103,21 +110,29 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
 
     return (
         <>
-            {props.user.type === "Ready" && props.user.user !== null ? (
+            {props.user.type === "Ready" ? (
                 <IonItem>
-                    <IonAvatar slot="end">
-                        <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y" />
-                    </IonAvatar>
                     <IonLabel>
-                        <h3>{props.user.user?.nickName}</h3>
-                        <p>
-                            Current balance:{" "}
-                            {props.user.user.balance.currentBalance}
-                        </p>
+                        <div className="UserMenu__TitleContainer">
+                            <div className="UserMenu__nickrow">
+                                <span>{props.user.user !== null ? `Hi, ${props.user.user.nickName}` : "Hi there"}</span>
+                                <Balance className="UserMenu__balance" />
+                            </div>
+                            {/* <div className="UserMenu__loginlogout">{props.user.user === null ?
+                                <div>
+                                    <span>Login</span>
+                                    <IonIcon icon={logIn} />
+                                </div> :
+                                <div>
+                                    <span>Logout</span>
+                                    <IonIcon icon={logOut} />
+                                </div>}
+                            </div> */}
+                        </div>
+                        {renderMenuItems()}
                     </IonLabel>
                 </IonItem>
             ) : null}
-            {renderMenuItems()}
         </>
     );
 };

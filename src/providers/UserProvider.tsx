@@ -4,7 +4,8 @@ import { CreateUserDTO } from "../interfaces/user";
 import Axios, { AxiosResponse } from "axios";
 
 interface Balance {
-  currentBalance: number;
+  chargedBalance: number;
+  earnedBalance: number;
 }
 
 export interface User {
