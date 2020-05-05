@@ -1,5 +1,5 @@
 import Menu from "./components/Menu";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IonApp, IonRouterOutlet, IonSplitPane } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
@@ -22,7 +22,7 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-import { UserProvider } from "./providers/UserProvider";
+import { UserProvider, withUser, UserProviderState } from "./providers/UserProvider";
 import { LoginPage } from "./pages/Login/Login";
 import { RegisterPage } from "./pages/Register/Register";
 import { ProfilePage } from "./pages/Profile/Profile";
@@ -30,75 +30,84 @@ import { PaymentPage } from "./pages/Payment/Payment";
 import { StreamPage } from "./pages/Stream/Stream";
 import { HomePage } from "./pages/Home/Home";
 
-const App: React.FC = () => {
+const App: React.FC<{ user: UserProviderState }> = ({ user }) => {
   const [selectedPage, setSelectedPage] = useState("");
 
+  let shouldRedirectHome = false;
+
+  if (user.type === "Ready") {
+    if (user.user === null) {
+      shouldRedirectHome = (selectedPage === "profile");
+    } else {
+      shouldRedirectHome = (selectedPage === "login" || selectedPage === "register");
+    }
+  }
+
   return (
-    <UserProvider>
-      <IonApp>
-        <IonReactRouter>
-          <IonSplitPane contentId="main">
-            <Menu selectedPage={selectedPage} />
-            <IonRouterOutlet id="main">
+    <IonApp>
+      <IonReactRouter>
+        {shouldRedirectHome ? <Redirect to="/home" /> : null}
+        <IonSplitPane contentId="main">
+          <Menu selectedPage={selectedPage} />
+          <IonRouterOutlet id="main">
             <Route
-                path="/home"
-                render={() => {
-                  setSelectedPage("home");
-                  return <HomePage />;
-                }}
-                exact={true}
-              />
-              <Route
-                path="/login"
-                render={() => {
-                  setSelectedPage("login");
-                  return <LoginPage />;
-                }}
-                exact={true}
-              />
-              <Route
-                path="/register"
-                render={() => {
-                  setSelectedPage("register");
-                  return <RegisterPage />;
-                }}
-                exact={true}
-              />
-              <Route
-                path="/profile"
-                render={() => {
-                  setSelectedPage("profile");
-                  return <ProfilePage />;
-                }}
-                exact={true}
-              />
-              <Route
-                path="/payment"
-                render={() => {
-                  setSelectedPage("payment");
-                  return <PaymentPage />;
-                }}
-                exact={true}
-              />
-              <Route
-                path="/channel/:nickName"
-                render={() => {
-                  setSelectedPage("channel");
-                  return <StreamPage />;
-                }}
-                exact={false}
-              />
-              <Route
-                path="/"
-                render={() => <Redirect to="/home" />}
-                exact={true}
-              />
-            </IonRouterOutlet>
-          </IonSplitPane>
-        </IonReactRouter>
-      </IonApp>
-    </UserProvider>
+              path="/home"
+              render={() => {
+                setSelectedPage("home");
+                return <HomePage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/login"
+              render={() => {
+                setSelectedPage("login");
+                return <LoginPage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/register"
+              render={() => {
+                setSelectedPage("register");
+                return <RegisterPage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/profile"
+              render={() => {
+                setSelectedPage("profile");
+                return <ProfilePage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/payment"
+              render={() => {
+                setSelectedPage("payment");
+                return <PaymentPage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/channel/:nickName"
+              render={() => {
+                setSelectedPage("channel");
+                return <StreamPage />;
+              }}
+              exact={false}
+            />
+            <Route
+              path="/"
+              render={() => <Redirect to="/home" />}
+              exact={true}
+            />
+          </IonRouterOutlet>
+        </IonSplitPane>
+      </IonReactRouter>
+    </IonApp>
   );
 };
 
-export default App;
+export default withUser(App);

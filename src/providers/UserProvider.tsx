@@ -20,7 +20,7 @@ export interface User {
 
 interface UserProviderStateCommons {
   logout: () => Promise<AxiosResponse<void>>;
-  register: (data: CreateUserDTO) => Promise<AxiosResponse<User>>;
+  register: (data: CreateUserDTO) => Promise<User | null>;
   login: (email: string, password: string) => Promise<User | null>;
   refresh: () => Promise<User | null>;
   facebookLogin: (token: string) => Promise<User | null>;
@@ -105,17 +105,39 @@ export class UserProvider extends Component<{}, UserProviderState> {
     });
   };
 
-  register = (data: CreateUserDTO) => {
+  register = async (registerData: CreateUserDTO) => {
     this.setState({ type: "Loading" });
-    return Axios.post<User>("/api/user", data).then((data) => {
+
+    let result = null;
+
+    try {
+      const data = (await Axios.post<User>("/api/user", registerData))
+        .data;
+
       this.setState({
         type: "Ready",
         ...this.getFunctions(),
-        user: data.data,
+        user: data,
       });
 
-      return data;
-    });
+      result = data;
+    } catch (e) {
+      debugger;
+      switch (e.response.status) {
+        case 401:
+          this.setState({
+            type: "Ready",
+            ...this.getFunctions(),
+            user: null,
+          });
+          break;
+        default:
+          this.setState({ type: "Failed" });
+          throw e;
+      }
+    }
+
+    return result;
   };
 
   login = async (email: string, password: string) => {
@@ -178,8 +200,8 @@ export class UserProvider extends Component<{}, UserProviderState> {
           break;
         default:
           this.setState({ type: "Failed" });
-          throw e;
       }
+      throw e;
     }
 
     return result;

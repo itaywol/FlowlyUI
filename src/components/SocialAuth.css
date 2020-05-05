@@ -1,0 +1,27 @@
+.SocialAuth__or {
+    margin: 10px 0;
+    color: #828286;
+    font-size: 16px;
+}
+
+.SocialAuth__socialContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 160px;
+}
+
+.SocialAuth__facebook {
+    background-color: #4c69ba;
+    color: white;
+    padding: 0 13px;
+    height: 50px;
+    border-radius: 64px;
+}
+
+.SocialAuth__google {
+    height: 50px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+}

@@ -11,12 +11,13 @@ import {
   IonSpinner,
   IonAlert
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Register.css";
 import { UserProviderState, withUser } from "../../providers/UserProvider";
-import { Redirect } from "react-router-dom";
+import { Redirect, withRouter, RouteComponentProps } from "react-router-dom";
+import { SocialAuth } from "../../components/SocialAuth";
 
-interface RegisterProps {
+interface RegisterProps extends RouteComponentProps {
   user: UserProviderState;
 }
 
@@ -24,7 +25,6 @@ interface RegisterState {
   email: string;
   password: string;
   nickName: string;
-  redirect?: string;
 }
 
 const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
@@ -48,10 +48,8 @@ const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
           nickName: state.nickName
         });
 
-        setState(prevState => {
-          prevState.redirect = "/home";
-          return prevState;
-        });
+        props.history.push("/home");
+        setShowAlert("Account created successfully");
       } catch (e) {
         switch (e.response.status) {
           case 401:
@@ -77,7 +75,6 @@ const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
       </IonHeader>
 
       <IonContent>
-        {state.redirect !== undefined ? <Redirect to={state.redirect} /> : null}
         <IonAlert
           isOpen={showAlert !== false}
           onDidDismiss={() => setShowAlert(false)}
@@ -85,49 +82,48 @@ const RegisterPageComponent: React.FunctionComponent<RegisterProps> = (
           message={showAlert !== false ? showAlert : ""}
           buttons={["Ok"]}
         />
-        {props.user.type === "Ready" ? (
-          <form className="RegisterPage__container" onSubmit={onSubmit}>
-            <IonInput
-              placeholder="Email"
-              type={"email"}
-              value={state.email}
-              onIonInput={e =>
-                setState(prevState => {
-                  prevState.email = (e.target as HTMLInputElement).value;
-                  return prevState;
-                })
-              }
-            />
-            <IonInput
-              placeholder="Password"
-              type={"password"}
-              value={state.password}
-              onIonInput={e =>
-                setState(prevState => {
-                  prevState.password = (e.target as HTMLInputElement).value;
-                  return prevState;
-                })
-              }
-            />
-            <IonInput
-              placeholder="Nickname"
-              type={"text"}
-              value={state.nickName}
-              onIonInput={e =>
-                setState(prevState => {
-                  prevState.nickName = (e.target as HTMLInputElement).value;
-                  return prevState;
-                })
-              }
-            />
-            <IonButton type={"submit"}>{"Register"}</IonButton>
-          </form>
-        ) : (
-          <IonSpinner />
-        )}
+        <form className="RegisterPage__container" onSubmit={onSubmit} autoComplete="on">
+          <IonInput
+            placeholder="Email"
+            type={"email"}
+            name="email"
+            value={state.email}
+            onIonInput={e =>
+              setState(prevState => {
+                prevState.email = (e.target as HTMLInputElement).value;
+                return prevState;
+              })
+            }
+          />
+          <IonInput
+            placeholder="Password"
+            name="password"
+            type={"password"}
+            value={state.password}
+            onIonInput={e =>
+              setState(prevState => {
+                prevState.password = (e.target as HTMLInputElement).value;
+                return prevState;
+              })
+            }
+          />
+          <IonInput
+            placeholder="Nickname"
+            type={"text"}
+            value={state.nickName}
+            onIonInput={e =>
+              setState(prevState => {
+                prevState.nickName = (e.target as HTMLInputElement).value;
+                return prevState;
+              })
+            }
+          />
+          <IonButton type={"submit"}>{"Register"}</IonButton>
+          <SocialAuth />
+        </form>
       </IonContent>
     </IonPage>
   );
 };
 
-export const RegisterPage = withUser(RegisterPageComponent);
+export const RegisterPage = withRouter(withUser(RegisterPageComponent));

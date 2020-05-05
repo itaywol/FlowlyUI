@@ -33,7 +33,7 @@ const ProfilePageContent: React.FunctionComponent<ProfileProps> = (
     props.user.user && (
       <IonCard>
         <IonCardHeader>
-          <IonCardTitle>Hello {props.user.user?.nickName}</IonCardTitle>
+          <IonCardTitle>Hello, {props.user.user?.nickName}</IonCardTitle>
           <IonCardSubtitle>
             <Balance fontSize={15}/>
           </IonCardSubtitle>
