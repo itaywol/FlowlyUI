@@ -128,15 +128,34 @@ const PaymentPageContent: React.FunctionComponent<
                         </IonCardContent>
                     )}
                     {state.checkoutCalled && state.checkoutSuccess && (
-                        <IonCardHeader>
-                            <IonCardTitle>Transaction Success</IonCardTitle>
-                            <IonButton
-                                routerLink={"/profile"}
-                                onClick={refresh}
-                            >
-                                Go to your profile
-                            </IonButton>
-                        </IonCardHeader>
+                        <>
+                            <IonCardHeader>
+                                <IonCardTitle>Transaction Success</IonCardTitle>
+                            </IonCardHeader>
+                            <IonCardContent>
+                                <IonButton
+                                    href={
+                                        "data:application/json," +
+                                        JSON.stringify(
+                                            state.transactionData?.transaction
+                                        )
+                                    }
+                                    download="true"
+                                    target="new"
+                                    color="light"
+                                >
+                                    Download receipt
+                                </IonButton>
+                            </IonCardContent>
+                            <IonCardContent>
+                                <IonButton
+                                    routerLink={"/profile"}
+                                    onClick={refresh}
+                                >
+                                    Go to your profile
+                                </IonButton>
+                            </IonCardContent>
+                        </>
                     )}
                     {state.checkoutCalled &&
                         !state.checkoutLoading &&
