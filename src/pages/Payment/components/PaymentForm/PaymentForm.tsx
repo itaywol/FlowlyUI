@@ -17,7 +17,8 @@ import {
     WithPaymentProps,
     PaymentPlan,
 } from "../../../../providers/PaymentProvider";
-import { ReactComponent as CoinsSvg } from "../../../../assets/svg/coins.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoins, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 
 export const PaymentForm: React.FunctionComponent<WithPaymentProps> = ({
     payment: { state, dispatch },
@@ -97,13 +98,10 @@ export const PaymentForm: React.FunctionComponent<WithPaymentProps> = ({
                                             ? state.selectedPaymentPlan?.worth
                                                   .total
                                             : state.specifyPaymentAmount}
-                                        <CoinsSvg
-                                            style={{
-                                                fill: "#5ca3e0",
-                                                width: "20px",
-                                                height: "20px",
-                                                display: "inline",
-                                            }}
+                                        <FontAwesomeIcon
+                                            icon={faCoins}
+                                            style={{ marginLeft: 4 }}
+                                            color="#FFDF00"
                                         />
                                     </h2>
                                 </IonText>

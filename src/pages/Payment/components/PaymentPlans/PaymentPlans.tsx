@@ -13,7 +13,8 @@ import {
     IonCardContent,
     IonText,
 } from "@ionic/react";
-import { ReactComponent as CoinsSvg } from "../../../../assets/svg/coins.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoins, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 export const PaymentPlanComponent: FC<
     { plan: PaymentPlan } & WithPaymentProps
 > = ({ plan, payment: { state, dispatch } }) => {
@@ -30,7 +31,11 @@ export const PaymentPlanComponent: FC<
                 dispatch && dispatch({ type: "usePlan", plan: plan })
             }
         >
-            <CoinsSvg className="payments-plans-coins" />
+            <FontAwesomeIcon
+                style={{ marginLeft: 4, fontSize: "3em", margin: "20px" }}
+                icon={faCoins}
+                color="#FFDF00"
+            />
             <IonCardHeader style={{ textAlign: "center" }}>
                 <IonCardTitle>{plan.worth.total} coins</IonCardTitle>
             </IonCardHeader>
