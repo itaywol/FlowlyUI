@@ -1,127 +1,218 @@
 import {
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonSpinner,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonButton,
-  IonCardTitle,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonMenuButton,
+    IonPage,
+    IonTitle,
+    IonToolbar,
+    IonSpinner,
+    IonCard,
+    IonCardHeader,
+    IonCardContent,
+    IonButton,
+    IonCardTitle,
+    IonSlides,
+    IonSlide,
 } from "@ionic/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, FC } from "react";
 import "./Payment.scss";
-import DropIn from "braintree-web-drop-in-react";
 import {
-  withPayment,
-  WithPaymentProps,
-  PaymentProvider,
+    withPayment,
+    WithPaymentProps,
+    PaymentProvider,
 } from "../../providers/PaymentProvider";
 import { PaymentForm } from "./components/PaymentForm/PaymentForm";
+import {
+    WithUserProps,
+    withUser,
+    UserProviderState,
+} from "../../providers/UserProvider";
+import { Redirect } from "react-router";
+import { PaymentSelector } from "./components/PaymentSelector/PaymentSelector";
 
-const PaymentPageContent: React.FunctionComponent<WithPaymentProps> = (
-  props: WithPaymentProps
-) => {
-  const {
-    state,
-    setInstance,
-    fetchToken,
-    checkout,
-    fetchPaymentPlans,
-  } = props.payment;
-  useEffect(() => {
-    if (fetchToken && !state.paymentToken) fetchToken();
-    if (!state.paymentPlans && fetchPaymentPlans) fetchPaymentPlans();
-  }, [state]);
+const PaymentPageContent: React.FunctionComponent<
+    WithPaymentProps & WithUserProps
+> = (props) => {
+    const {
+        state,
+        setInstance,
+        fetchToken,
+        checkout,
+        fetchPaymentPlans,
+    } = props.payment;
+    useEffect(() => {
+        if (fetchToken && !state.paymentToken) fetchToken();
+        if (!state.paymentPlans && fetchPaymentPlans) fetchPaymentPlans();
+    }, [state]);
 
-  return (
-    <>
-      <IonCard>
-        {state.checkoutCalled && state.checkoutLoading && <IonSpinner />}
-        {state.checkoutSuccess && (
-          <IonCardHeader>
-            <IonCardTitle>Transaction Success</IonCardTitle>
-          </IonCardHeader>
-        )}
-        {state.checkoutCalled &&
-          !state.checkoutLoading &&
-          !state.checkoutSuccess && (
-            <IonCardHeader>
-              <IonCardTitle>Trasnaction Failed</IonCardTitle>
-            </IonCardHeader>
-          )}
-        {!state.checkoutCalled && !state.checkoutLoading && (
-          <>
-            <IonCardHeader>
-              <IonCardTitle>Charge your account</IonCardTitle>
-            </IonCardHeader>
-            <PaymentForm {...props} />
-            <IonCardContent>
-              {state.paymentToken?.clientToken &&
-                (state?.specifyPaymentAmount ||
-                  state?.selectedPaymentPlan?.price) && (
-                  <>
-                    <DropIn
-                      options={{
-                        authorization: state?.paymentToken?.clientToken,
-                        paymentOptionPriority: ["paypal", "card"],
-                        paypal: {
-                          intent: "authorize",
-                          flow: "checkout",
-                          amount: state.checkoutUsingPaymentPlan
-                            ? state.selectedPaymentPlan?.price
-                            : state.specifyPaymentAmount,
-                          currency: "USD",
-                        },
-                      }}
-                      onInstance={(instance: any) => {
-                        if (setInstance) setInstance(instance);
-                      }}
-                    ></DropIn>
-                    <IonButton
-                      fill="solid"
-                      style={{ width: "100%" }}
-                      onClick={() => {
-                        if (checkout !== null) checkout();
-                      }}
-                    >
-                      Submit Payment
-                    </IonButton>
-                  </>
+    const slider = useRef<HTMLIonSlidesElement | null>(null);
+
+    const handleNext = () => {
+        slider.current?.lockSwipes(false);
+        if (slider.current) slider.current.slideNext();
+        slider.current?.lockSwipes(true);
+    };
+    const handlePrev = () => {
+        slider.current?.lockSwipes(false);
+        if (slider.current) slider.current.slidePrev();
+        slider.current?.lockSwipes(true);
+    };
+
+    const lockSlides = () => {
+        if (slider.current) slider.current.lockSwipes(true);
+    };
+
+    const checkPayments = () => {
+        return (
+            state.specifyPaymentAmount >= 10 ||
+            state.selectedPaymentPlan?.price !== undefined
+        );
+    };
+
+    const refresh = () => {
+        if (props.user.type === "Ready") props.user.refresh();
+    };
+
+    useEffect(() => {
+        if (state.paymentToken?.success === false) console.log("not token");
+    }, [state.paymentToken?.success]);
+
+    if (!state.paymentToken?.clientToken)
+        return (
+            <IonContent fullscreen>
+                <IonSpinner />
+            </IonContent>
+        );
+
+    return (
+        <IonSlides
+            pager={false}
+            scrollbar={true}
+            ref={slider}
+            style={{ height: "100%" }}
+            onIonSlidesDidLoad={() => lockSlides()}
+        >
+            <IonSlide>
+                {!state.checkoutCalled && !state.checkoutLoading && (
+                    <IonContent fullscreen>
+                        <PaymentForm {...props} />
+                        <IonButton
+                            color="primary"
+                            style={{ width: "100%" }}
+                            disabled={!checkPayments()}
+                            onClick={() => {
+                                if (checkPayments()) handleNext();
+                            }}
+                        >
+                            Continue
+                        </IonButton>
+                    </IonContent>
                 )}
-            </IonCardContent>
-          </>
-        )}
-      </IonCard>
-    </>
-  );
+            </IonSlide>
+            <IonSlide>
+                {(state?.specifyPaymentAmount ||
+                    state?.selectedPaymentPlan?.price) && (
+                    <PaymentSelector
+                        {...props}
+                        handleNext={handleNext}
+                        handlePrev={handlePrev}
+                    />
+                )}
+            </IonSlide>
+            <IonSlide>
+                <IonCard>
+                    {state.checkoutLoading && (
+                        <IonCardContent>
+                            <IonSpinner />
+                        </IonCardContent>
+                    )}
+                    {state.checkoutCalled && state.checkoutSuccess && (
+                        <>
+                            <IonCardHeader>
+                                <IonCardTitle>Transaction Success</IonCardTitle>
+                            </IonCardHeader>
+                            <IonCardContent>
+                                <IonButton
+                                    href={
+                                        "data:application/json," +
+                                        JSON.stringify(
+                                            state.transactionData?.transaction
+                                        )
+                                    }
+                                    download="true"
+                                    target="new"
+                                    color="light"
+                                >
+                                    Download receipt
+                                </IonButton>
+                            </IonCardContent>
+                            <IonCardContent>
+                                <IonButton
+                                    routerLink={"/profile"}
+                                    onClick={refresh}
+                                >
+                                    Go to your profile
+                                </IonButton>
+                            </IonCardContent>
+                        </>
+                    )}
+                    {state.checkoutCalled &&
+                        !state.checkoutLoading &&
+                        !state.checkoutSuccess && (
+                            <IonCardHeader>
+                                <IonCardTitle>Transaction Failed</IonCardTitle>
+                                <IonButton
+                                    routerLink={"/payment"}
+                                    onClick={refresh}
+                                >
+                                    Try Again
+                                </IonButton>
+                            </IonCardHeader>
+                        )}
+                </IonCard>
+            </IonSlide>
+        </IonSlides>
+    );
 };
 
-const PaymentPageWithPayment = withPayment(PaymentPageContent);
+const PaymentPageWithPayment = withUser(withPayment(PaymentPageContent));
 
-const PaymentPageComponent: React.FunctionComponent = () => {
-  return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
-          <IonTitle>Payment</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+interface PaymentPageProps {
+    user: UserProviderState;
+}
+const PaymentPageComponent: React.FunctionComponent<PaymentPageProps> = (
+    props: PaymentPageProps
+) => {
+    switch (props.user.type) {
+        case "Loading":
+            return (
+                <IonPage>
+                    <IonSpinner />
+                </IonPage>
+            );
+        case "Ready":
+            return (
+                <IonPage>
+                    <IonHeader>
+                        <IonToolbar>
+                            <IonButtons slot="start">
+                                <IonMenuButton />
+                            </IonButtons>
+                            <IonTitle>Payment</IonTitle>
+                        </IonToolbar>
+                    </IonHeader>
 
-      <IonContent fullscreen class="ion-padding">
-        <PaymentProvider>
-          <PaymentPageWithPayment />
-        </PaymentProvider>
-      </IonContent>
-    </IonPage>
-  );
+                    <IonContent fullscreen class="ion-padding" scrollY={false}>
+                        <PaymentProvider>
+                            <PaymentPageWithPayment />
+                        </PaymentProvider>
+                    </IonContent>
+                </IonPage>
+            );
+        case "Failed":
+            return <div>Error getting user</div>;
+    }
 };
 
-export const PaymentPage = PaymentPageComponent;
+export const PaymentPage = withUser(PaymentPageComponent);
