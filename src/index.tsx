@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { UserProvider } from "./providers/UserProvider";
+import { StreamingProvider } from "./providers/StreamingProvider";
 
-ReactDOM.render(<UserProvider><App /></UserProvider>, document.getElementById("root"));
+ReactDOM.render(<StreamingProvider><UserProvider><App /></UserProvider></StreamingProvider>, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

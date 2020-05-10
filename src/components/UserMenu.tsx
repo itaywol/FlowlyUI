@@ -1,4 +1,4 @@
-import { logIn, logOut, key } from "ionicons/icons";
+import { logIn, logOut, key, videocam } from "ionicons/icons";
 import {
     IonIcon,
     IonItem,
@@ -97,6 +97,21 @@ const UserMenuComponent: React.FunctionComponent<UserMenuProps> = (
                             >
                                 <IonIcon slot="start" icon={key} />
                                 <IonLabel>{"Profile"}</IonLabel>
+                            </IonItem>
+                            <IonItem
+                                className={
+                                    props.selectedPage === "streaming"
+                                        ? "selected"
+                                        : ""
+                                }
+                                onClick={() => menuController.close()}
+                                routerLink={"streaming"}
+                                routerDirection="none"
+                                lines="none"
+                                detail={false}
+                            >
+                                <IonIcon slot="start" icon={videocam} />
+                                <IonLabel>{"Stream"}</IonLabel>
                             </IonItem>
                         </>
                     );

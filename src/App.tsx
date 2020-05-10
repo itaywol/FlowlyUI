@@ -29,6 +29,7 @@ import { ProfilePage } from "./pages/Profile/Profile";
 import { PaymentPage } from "./pages/Payment/Payment";
 import { StreamPage } from "./pages/Stream/Stream";
 import { HomePage } from "./pages/Home/Home";
+import { StreamingPage } from "./pages/Streaming/Streaming";
 
 const App: React.FC<{ user: UserProviderState }> = ({ user }) => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -71,6 +72,14 @@ const App: React.FC<{ user: UserProviderState }> = ({ user }) => {
               render={() => {
                 setSelectedPage("register");
                 return <RegisterPage />;
+              }}
+              exact={true}
+            />
+            <Route
+              path="/streaming"
+              render={() => {
+                setSelectedPage("streaming");
+                return <StreamingPage />;
               }}
               exact={true}
             />
