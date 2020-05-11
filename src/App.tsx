@@ -38,7 +38,7 @@ const App: React.FC<{ user: UserProviderState }> = ({ user }) => {
 
   if (user.type === "Ready") {
     if (user.user === null) {
-      shouldRedirectHome = (selectedPage === "profile");
+      shouldRedirectHome = (selectedPage === "profile" || selectedPage === "streaming");
     } else {
       shouldRedirectHome = (selectedPage === "login" || selectedPage === "register");
     }
